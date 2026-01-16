@@ -40,7 +40,7 @@ export const HeroSection = () => {
           >
             <span className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-water-light text-water-dark text-xs sm:text-sm font-medium mb-4 sm:mb-6">
               <Droplets className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              ICM InfoWorks Modeling Guide
+              Autodesk InfoWorks ICM Guide
             </span>
           </motion.div>
 
@@ -53,7 +53,7 @@ export const HeroSection = () => {
             Learn{" "}
             <span className="text-gradient-water">River Reach</span>
             <br className="hidden xs:block" />
-            <span className="xs:hidden"> </span>Modeling in ICM
+            <span className="xs:hidden"> </span>& 2D Modeling
           </motion.h1>
 
           <motion.p
@@ -62,8 +62,8 @@ export const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-10 max-w-2xl mx-auto"
           >
-            An interactive guide to understanding and building 1D river reach models 
-            in ICM InfoWorks. Explore components, learn workflows, and master 
+            An interactive guide to understanding and building 1D river reach and 2D surface models 
+            in Autodesk InfoWorks ICM. Explore components, learn workflows, and master 
             hydraulic modeling concepts.
           </motion.p>
 
