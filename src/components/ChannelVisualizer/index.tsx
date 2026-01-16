@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain } from 'lucide-react';
+import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets } from 'lucide-react';
 import { ViewMode, ChannelGeometry, HydraulicParams } from './types';
 import { useHydraulicCalculations } from './useHydraulicCalculations';
 import { CrossSectionView } from './CrossSectionView';
@@ -10,33 +10,99 @@ import { ControlPanel } from './ControlPanel';
 import { ResultsPanel } from './ResultsPanel';
 import { ICMConceptCard } from './ICMConceptCard';
 
-const defaultGeometry: ChannelGeometry = {
-  bottomWidth: 10,
-  bankSlope: 2,
-  channelDepth: 3,
-  floodplainWidth: 20,
-};
+interface ChannelPreset {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  description: string;
+  geometry: ChannelGeometry;
+  params: HydraulicParams;
+  showFloodplain: boolean;
+}
 
-const defaultParams: HydraulicParams = {
-  manningN: 0.035,
-  manningNFloodplain: 0.08,
-  bedSlope: 0.001,
-  waterLevel: 2,
-};
+const channelPresets: ChannelPreset[] = [
+  {
+    id: 'natural-river',
+    name: 'Natural River',
+    icon: <TreePine className="w-4 h-4" />,
+    description: 'Meandering channel with vegetated floodplains',
+    geometry: {
+      bottomWidth: 15,
+      bankSlope: 2.5,
+      channelDepth: 3.5,
+      floodplainWidth: 30,
+    },
+    params: {
+      manningN: 0.035,
+      manningNFloodplain: 0.08,
+      bedSlope: 0.0008,
+      waterLevel: 2.5,
+    },
+    showFloodplain: true,
+  },
+  {
+    id: 'concrete-channel',
+    name: 'Concrete Channel',
+    icon: <Building2 className="w-4 h-4" />,
+    description: 'Engineered channel with smooth surfaces',
+    geometry: {
+      bottomWidth: 8,
+      bankSlope: 1,
+      channelDepth: 4,
+      floodplainWidth: 5,
+    },
+    params: {
+      manningN: 0.015,
+      manningNFloodplain: 0.025,
+      bedSlope: 0.002,
+      waterLevel: 2,
+    },
+    showFloodplain: false,
+  },
+  {
+    id: 'vegetated-swale',
+    name: 'Vegetated Swale',
+    icon: <Droplets className="w-4 h-4" />,
+    description: 'Shallow grassed drainage channel',
+    geometry: {
+      bottomWidth: 3,
+      bankSlope: 4,
+      channelDepth: 1.2,
+      floodplainWidth: 10,
+    },
+    params: {
+      manningN: 0.045,
+      manningNFloodplain: 0.1,
+      bedSlope: 0.005,
+      waterLevel: 0.6,
+    },
+    showFloodplain: false,
+  },
+];
+
+const defaultGeometry: ChannelGeometry = channelPresets[0].geometry;
+const defaultParams: HydraulicParams = channelPresets[0].params;
 
 export const ChannelVisualizer = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('cross-section');
   const [geometry, setGeometry] = useState<ChannelGeometry>(defaultGeometry);
   const [params, setParams] = useState<HydraulicParams>(defaultParams);
-  const [showFloodplain, setShowFloodplain] = useState(false);
+  const [showFloodplain, setShowFloodplain] = useState(true);
   const [isAnimating, setIsAnimating] = useState(true);
+  const [activePreset, setActivePreset] = useState<string>('natural-river');
 
   const results = useHydraulicCalculations(geometry, params, showFloodplain);
 
+  const applyPreset = (preset: ChannelPreset) => {
+    setGeometry(preset.geometry);
+    setParams(preset.params);
+    setShowFloodplain(preset.showFloodplain);
+    setActivePreset(preset.id);
+  };
+
   const resetAll = () => {
-    setGeometry(defaultGeometry);
-    setParams(defaultParams);
-    setShowFloodplain(false);
+    const defaultPreset = channelPresets[0];
+    applyPreset(defaultPreset);
   };
 
   const viewModes = [
@@ -47,6 +113,47 @@ export const ChannelVisualizer = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* Preset Selection */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {channelPresets.map(preset => (
+          <motion.button
+            key={preset.id}
+            onClick={() => applyPreset(preset)}
+            className={`flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+              activePreset === preset.id
+                ? 'bg-primary/10 border-primary shadow-md'
+                : 'bg-card border-border hover:border-primary/50'
+            }`}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            <div className={`p-2 rounded-lg ${
+              activePreset === preset.id ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
+            }`}>
+              {preset.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className={`font-semibold text-sm ${
+                activePreset === preset.id ? 'text-primary' : 'text-foreground'
+              }`}>
+                {preset.name}
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                {preset.description}
+              </p>
+              <div className="flex flex-wrap gap-1 mt-2">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground font-mono">
+                  n={preset.params.manningN}
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-secondary text-muted-foreground font-mono">
+                  b={preset.geometry.bottomWidth}m
+                </span>
+              </div>
+            </div>
+          </motion.button>
+        ))}
+      </div>
+
       {/* View Mode Tabs & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex bg-secondary rounded-lg p-1">
