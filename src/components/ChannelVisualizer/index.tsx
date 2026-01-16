@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets } from 'lucide-react';
+import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3 } from 'lucide-react';
 import { ViewMode, ChannelGeometry, HydraulicParams } from './types';
 import { useHydraulicCalculations } from './useHydraulicCalculations';
 import { CrossSectionView } from './CrossSectionView';
 import { LongProfileView } from './LongProfileView';
 import { PlanView } from './PlanView';
+import { IrregularCrossSectionEditor } from './IrregularCrossSectionEditor';
+import { BridgeCulvertView } from './BridgeCulvertView';
+import { CouplingZonesView } from './CouplingZonesView';
 import { ControlPanel } from './ControlPanel';
 import { ResultsPanel } from './ResultsPanel';
 import { ICMConceptCard } from './ICMConceptCard';
-
+import { AdvancedConceptsSection } from './AdvancedConceptsSection';
 interface ChannelPreset {
   id: string;
   name: string;
@@ -109,6 +112,9 @@ export const ChannelVisualizer = () => {
     { id: 'cross-section' as ViewMode, label: 'Cross-Section', icon: Layers },
     { id: 'long-profile' as ViewMode, label: 'Long Profile', icon: Eye },
     { id: 'plan-view' as ViewMode, label: 'Plan View', icon: Map },
+    { id: 'irregular-section' as ViewMode, label: 'Irregular Section', icon: PenTool },
+    { id: 'bridge-culvert' as ViewMode, label: 'Bridge/Culvert', icon: Milestone },
+    { id: 'coupling-zones' as ViewMode, label: '1D/2D Coupling', icon: Grid3X3 },
   ];
 
   return (
@@ -196,7 +202,9 @@ export const ChannelVisualizer = () => {
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Visualization Canvas */}
-        <div className="lg:col-span-3 bg-card rounded-xl p-4 border border-border shadow-lg">
+        <div className={`bg-card rounded-xl p-4 border border-border shadow-lg ${
+          ['irregular-section', 'bridge-culvert', 'coupling-zones'].includes(viewMode) ? 'lg:col-span-4' : 'lg:col-span-3'
+        }`}>
           <motion.div key={viewMode} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
             {viewMode === 'cross-section' && (
               <CrossSectionView geometry={geometry} params={params} results={results} showFloodplain={showFloodplain} isAnimating={isAnimating} />
@@ -207,22 +215,35 @@ export const ChannelVisualizer = () => {
             {viewMode === 'plan-view' && (
               <PlanView geometry={geometry} params={params} results={results} showFloodplain={showFloodplain} isAnimating={isAnimating} />
             )}
+            {viewMode === 'irregular-section' && (
+              <IrregularCrossSectionEditor />
+            )}
+            {viewMode === 'bridge-culvert' && (
+              <BridgeCulvertView isAnimating={isAnimating} />
+            )}
+            {viewMode === 'coupling-zones' && (
+              <CouplingZonesView isAnimating={isAnimating} />
+            )}
           </motion.div>
         </div>
 
-        {/* Control Panel */}
-        <ControlPanel
-          geometry={geometry}
-          params={params}
-          showFloodplain={showFloodplain}
-          onGeometryChange={setGeometry}
-          onParamsChange={setParams}
-          onFloodplainToggle={setShowFloodplain}
-        />
+        {/* Control Panel - only show for basic views */}
+        {!['irregular-section', 'bridge-culvert', 'coupling-zones'].includes(viewMode) && (
+          <ControlPanel
+            geometry={geometry}
+            params={params}
+            showFloodplain={showFloodplain}
+            onGeometryChange={setGeometry}
+            onParamsChange={setParams}
+            onFloodplainToggle={setShowFloodplain}
+          />
+        )}
       </div>
 
-      {/* Results Panel */}
-      <ResultsPanel results={results} />
+      {/* Results Panel - only show for basic views */}
+      {!['irregular-section', 'bridge-culvert', 'coupling-zones'].includes(viewMode) && (
+        <ResultsPanel results={results} />
+      )}
 
       {/* ICM Concepts Section */}
       <div className="pt-6">
@@ -272,6 +293,9 @@ export const ChannelVisualizer = () => {
           />
         </div>
       </div>
+
+      {/* Advanced Concepts Section */}
+      <AdvancedConceptsSection />
     </div>
   );
 };
