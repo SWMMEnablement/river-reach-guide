@@ -26,15 +26,15 @@ const Index = () => {
       <HeroSection />
 
       {/* Interactive Diagram Section */}
-      <section id="diagram" className="py-16 lg:py-24">
-        <div className="container mx-auto px-6">
+      <section id="diagram" className="py-10 sm:py-16 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8 sm:mb-12"
           >
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
               Understanding the River Reach Model
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -48,19 +48,19 @@ const Index = () => {
       </section>
 
       {/* Channel Visualizer Section */}
-      <section id="editor" className="py-16 lg:py-24 bg-secondary/30">
-        <div className="container mx-auto px-6">
+      <section id="editor" className="py-10 sm:py-16 lg:py-24 bg-secondary/30">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8 sm:mb-12"
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-terrain-light text-terrain text-sm font-medium mb-4">
-              <PenTool className="w-4 h-4" />
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-terrain-light text-terrain text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+              <PenTool className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Interactive Tool
             </span>
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
               Channel Visualizer
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -74,18 +74,18 @@ const Index = () => {
       </section>
 
       {/* Modeling Steps Section */}
-      <section id="steps" className="py-16 lg:py-24 bg-secondary/30">
-        <div className="container mx-auto px-6">
+      <section id="steps" className="py-10 sm:py-16 lg:py-24 bg-secondary/30">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8 sm:mb-12"
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-water-light text-water-dark text-sm font-medium mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-water-light text-water-dark text-xs sm:text-sm font-medium mb-3 sm:mb-4">
               Step-by-Step Guide
             </span>
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
               Building Your River Reach Model
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -99,18 +99,18 @@ const Index = () => {
       </section>
 
       {/* Components Reference Section */}
-      <section id="components" className="py-16 lg:py-24">
-        <div className="container mx-auto px-6">
+      <section id="components" className="py-10 sm:py-16 lg:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8 sm:mb-12"
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-node-light text-node text-sm font-medium mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-node-light text-node text-xs sm:text-sm font-medium mb-3 sm:mb-4">
               Quick Reference
             </span>
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
               Key Model Components
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -190,19 +190,19 @@ const Index = () => {
       </section>
 
       {/* Knowledge Quiz Section */}
-      <section id="quiz" className="py-16 lg:py-24 bg-secondary/30">
-        <div className="container mx-auto px-6">
+      <section id="quiz" className="py-10 sm:py-16 lg:py-24 bg-secondary/30">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8 sm:mb-12"
           >
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              <GraduationCap className="w-4 h-4" />
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+              <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               Test Your Knowledge
             </span>
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
               River Modeling Quiz
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -216,19 +216,19 @@ const Index = () => {
       </section>
 
       {/* Resources Section */}
-      <section className="py-16 lg:py-24 bg-gradient-water">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center">
+      <section className="py-10 sm:py-16 lg:py-24 bg-gradient-water">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto text-center px-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <BookOpen className="w-12 h-12 text-white/90 mx-auto mb-6" />
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-white/90 mx-auto mb-4 sm:mb-6" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">
                 Official ICM Documentation
               </h2>
-              <p className="text-white/80 mb-8 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto">
                 Access the complete ICM InfoWorks online help for detailed technical 
                 reference, tutorials, and advanced modeling techniques.
               </p>
@@ -247,8 +247,8 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-card border-t border-border">
-        <div className="container mx-auto px-6">
+      <footer className="py-6 sm:py-8 bg-card border-t border-border safe-area-inset">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Waves className="w-5 h-5 text-primary" />

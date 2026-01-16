@@ -111,12 +111,12 @@ export const ChannelVisualizer = () => {
   };
 
   const viewModes = [
-    { id: 'cross-section' as ViewMode, label: 'Cross-Section', icon: Layers },
-    { id: 'long-profile' as ViewMode, label: 'Long Profile', icon: Eye },
-    { id: 'plan-view' as ViewMode, label: 'Plan View', icon: Map },
-    { id: 'irregular-section' as ViewMode, label: 'Irregular Section', icon: PenTool },
-    { id: 'bridge-culvert' as ViewMode, label: 'Bridge/Culvert', icon: Milestone },
-    { id: 'coupling-zones' as ViewMode, label: '1D/2D Coupling', icon: Grid3X3 },
+    { id: 'cross-section' as ViewMode, label: 'Cross-Section', shortLabel: 'Section', icon: Layers },
+    { id: 'long-profile' as ViewMode, label: 'Long Profile', shortLabel: 'Profile', icon: Eye },
+    { id: 'plan-view' as ViewMode, label: 'Plan View', shortLabel: 'Plan', icon: Map },
+    { id: 'irregular-section' as ViewMode, label: 'Irregular Section', shortLabel: 'Irregular', icon: PenTool },
+    { id: 'bridge-culvert' as ViewMode, label: 'Bridge/Culvert', shortLabel: 'Bridge', icon: Milestone },
+    { id: 'coupling-zones' as ViewMode, label: '1D/2D Coupling', shortLabel: '1D/2D', icon: Grid3X3 },
   ];
 
   return (
@@ -163,33 +163,36 @@ export const ChannelVisualizer = () => {
       </div>
 
       {/* View Mode Tabs & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex bg-secondary rounded-lg p-1">
-          {viewModes.map(mode => (
-            <button
-              key={mode.id}
-              onClick={() => setViewMode(mode.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                viewMode === mode.id
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <mode.icon className="w-4 h-4" />
-              <span className="hidden sm:inline">{mode.label}</span>
-            </button>
-          ))}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex bg-secondary rounded-lg p-1 overflow-x-auto scrollbar-hide">
+          <div className="flex min-w-max">
+            {viewModes.map(mode => (
+              <button
+                key={mode.id}
+                onClick={() => setViewMode(mode.id)}
+                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                  viewMode === mode.id
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <mode.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="hidden xs:inline sm:hidden">{mode.shortLabel}</span>
+                <span className="hidden sm:inline">{mode.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-end">
           <button
             onClick={() => setIsAnimating(!isAnimating)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
               isAnimating ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'
             }`}
           >
             {isAnimating ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            <span className="text-sm">{isAnimating ? 'Pause' : 'Animate'}</span>
+            <span className="hidden xs:inline">{isAnimating ? 'Pause' : 'Animate'}</span>
           </button>
           <button
             onClick={resetAll}
