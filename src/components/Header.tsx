@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Waves, BookOpen, ExternalLink, GraduationCap } from "lucide-react";
+import { Waves, BookOpen, ExternalLink, GraduationCap, PenTool } from "lucide-react";
 
 export const Header = () => {
   return (
@@ -23,7 +23,7 @@ export const Header = () => {
           <motion.nav
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-6"
+            className="flex items-center gap-5"
           >
             <a
               href="#diagram"
@@ -32,16 +32,17 @@ export const Header = () => {
               Diagram
             </a>
             <a
+              href="#editor"
+              className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <PenTool className="w-3.5 h-3.5" />
+              Editor
+            </a>
+            <a
               href="#steps"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Steps
-            </a>
-            <a
-              href="#components"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Components
             </a>
             <a
               href="#quiz"
