@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3, Box } from 'lucide-react';
+import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3 } from 'lucide-react';
 import { ViewMode, ChannelGeometry, HydraulicParams } from './types';
 import { useHydraulicCalculations } from './useHydraulicCalculations';
 import { CrossSectionView } from './CrossSectionView';
@@ -16,6 +16,8 @@ import { AdvancedConceptsSection } from './AdvancedConceptsSection';
 import { TroubleshootingSection } from './TroubleshootingSection';
 import { TwoDModelingSection } from './TwoDModelingSection';
 import { SWMM5ChannelsSection } from './SWMM5ChannelsSection';
+import { SWMM5ConduitsSection } from './SWMM5ConduitsSection';
+import { SuDSSection } from './SuDSSection';
 import RubyScriptsSection from './RubyScriptsSection';
 interface ChannelPreset {
   id: string;
@@ -252,11 +254,11 @@ export const ChannelVisualizer = () => {
         <ResultsPanel results={results} />
       )}
 
-      {/* ICM Concepts Section */}
+      {/* Autodesk InfoWorks ICM Concepts Section */}
       <div className="pt-6">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold text-foreground">ICM Hydraulic Concepts</h3>
+          <h3 className="text-lg font-semibold text-foreground">Autodesk InfoWorks ICM Hydraulic Concepts</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <ICMConceptCard
@@ -281,7 +283,7 @@ export const ChannelVisualizer = () => {
               "Continuity: mass conservation (∂A/∂t + ∂Q/∂x = q)",
               "Momentum: force balance along flow direction",
               "Solved numerically using finite difference methods",
-              "ICM uses Preissmann implicit scheme"
+              "Autodesk InfoWorks ICM uses Preissmann implicit scheme"
             ]}
             color="water"
           />
@@ -309,6 +311,12 @@ export const ChannelVisualizer = () => {
 
       {/* SWMM5 Channels Section */}
       <SWMM5ChannelsSection />
+
+      {/* SWMM5 Conduits Section */}
+      <SWMM5ConduitsSection />
+
+      {/* SuDS Section */}
+      <SuDSSection />
 
       {/* Ruby Scripts Section */}
       <RubyScriptsSection />
