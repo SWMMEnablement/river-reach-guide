@@ -4,6 +4,7 @@ import { RiverReachDiagram } from "@/components/RiverReachDiagram";
 import { ModelingSteps } from "@/components/ModelingSteps";
 import { ComponentCard } from "@/components/ComponentCard";
 import { KnowledgeQuiz } from "@/components/KnowledgeQuiz";
+import { CrossSectionEditor } from "@/components/CrossSectionEditor";
 import { motion } from "framer-motion";
 import { 
   Circle, 
@@ -14,7 +15,8 @@ import {
   Mountain,
   ExternalLink,
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  PenTool
 } from "lucide-react";
 
 const Index = () => {
@@ -42,6 +44,32 @@ const Index = () => {
           </motion.div>
 
           <RiverReachDiagram />
+        </div>
+      </section>
+
+      {/* Cross-Section Editor Section */}
+      <section id="editor" className="py-16 lg:py-24 bg-secondary/30">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-terrain-light text-terrain text-sm font-medium mb-4">
+              <PenTool className="w-4 h-4" />
+              Interactive Tool
+            </span>
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              Cross-Section Editor
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Design and modify channel geometry interactively. Drag survey points to reshape 
+              the cross-section and observe real-time hydraulic property calculations.
+            </p>
+          </motion.div>
+
+          <CrossSectionEditor />
         </div>
       </section>
 
