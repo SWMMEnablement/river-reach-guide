@@ -20,6 +20,8 @@ import { SWMM5ConduitsSection } from './SWMM5ConduitsSection';
 import { SuDSSection } from './SuDSSection';
 import { LIDControlsSection } from './LIDControlsSection';
 import { RatingCurveGenerator } from './RatingCurveGenerator';
+import CulvertDesignCalculator from './CulvertDesignCalculator';
+import FroudeNumberCalculator from './FroudeNumberCalculator';
 import RubyScriptsSection from './RubyScriptsSection';
 interface ChannelPreset {
   id: string;
@@ -325,6 +327,12 @@ export const ChannelVisualizer = () => {
 
       {/* Rating Curve Generator */}
       <RatingCurveGenerator />
+
+      {/* Culvert Design Calculator */}
+      <CulvertDesignCalculator />
+
+      {/* Froude Number Calculator */}
+      <FroudeNumberCalculator />
 
       {/* Ruby Scripts Section */}
       <RubyScriptsSection />
