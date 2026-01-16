@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { RiverReachDiagram } from "@/components/RiverReachDiagram";
 import { ModelingSteps } from "@/components/ModelingSteps";
 import { ComponentCard } from "@/components/ComponentCard";
+import { KnowledgeQuiz } from "@/components/KnowledgeQuiz";
 import { motion } from "framer-motion";
 import { 
   Circle, 
@@ -12,7 +13,8 @@ import {
   Waves, 
   Mountain,
   ExternalLink,
-  BookOpen
+  BookOpen,
+  GraduationCap
 } from "lucide-react";
 
 const Index = () => {
@@ -156,6 +158,32 @@ const Index = () => {
               color="terrain"
             />
           </div>
+        </div>
+      </section>
+
+      {/* Knowledge Quiz Section */}
+      <section id="quiz" className="py-16 lg:py-24 bg-secondary/30">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+              <GraduationCap className="w-4 h-4" />
+              Test Your Knowledge
+            </span>
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              River Modeling Quiz
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Test your understanding of river reach modeling concepts with this 
+              interactive quiz. Get immediate feedback on each answer.
+            </p>
+          </motion.div>
+
+          <KnowledgeQuiz />
         </div>
       </section>
 

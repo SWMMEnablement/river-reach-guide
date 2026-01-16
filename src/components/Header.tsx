@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Waves, BookOpen, ExternalLink } from "lucide-react";
+import { Waves, BookOpen, ExternalLink, GraduationCap } from "lucide-react";
 
 export const Header = () => {
   return (
@@ -42,6 +42,13 @@ export const Header = () => {
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Components
+            </a>
+            <a
+              href="#quiz"
+              className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <GraduationCap className="w-4 h-4" />
+              Quiz
             </a>
             <a
               href="https://help.autodesk.com/view/IWICMS/2025/ENU/"
