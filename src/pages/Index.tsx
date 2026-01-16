@@ -4,7 +4,7 @@ import { RiverReachDiagram } from "@/components/RiverReachDiagram";
 import { ModelingSteps } from "@/components/ModelingSteps";
 import { ComponentCard } from "@/components/ComponentCard";
 import { KnowledgeQuiz } from "@/components/KnowledgeQuiz";
-import { CrossSectionEditor } from "@/components/CrossSectionEditor";
+import { ChannelVisualizer } from "@/components/ChannelVisualizer";
 import { motion } from "framer-motion";
 import { 
   Circle, 
@@ -47,7 +47,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Cross-Section Editor Section */}
+      {/* Channel Visualizer Section */}
       <section id="editor" className="py-16 lg:py-24 bg-secondary/30">
         <div className="container mx-auto px-6">
           <motion.div
@@ -61,15 +61,15 @@ const Index = () => {
               Interactive Tool
             </span>
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              Cross-Section Editor
+              Channel Visualizer
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Design and modify channel geometry interactively. Drag survey points to reshape 
-              the cross-section and observe real-time hydraulic property calculations.
+              Explore trapezoidal channel geometry with three visualization modes. 
+              Adjust parameters and see real-time Manning's equation calculations.
             </p>
           </motion.div>
 
-          <CrossSectionEditor />
+          <ChannelVisualizer />
         </div>
       </section>
 
