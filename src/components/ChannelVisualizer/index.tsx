@@ -14,6 +14,7 @@ import { ResultsPanel } from './ResultsPanel';
 import { ICMConceptCard } from './ICMConceptCard';
 import { AdvancedConceptsSection } from './AdvancedConceptsSection';
 import { TroubleshootingSection } from './TroubleshootingSection';
+import RubyScriptsSection from './RubyScriptsSection';
 interface ChannelPreset {
   id: string;
   name: string;
@@ -297,6 +298,9 @@ export const ChannelVisualizer = () => {
 
       {/* Advanced Concepts Section */}
       <AdvancedConceptsSection />
+
+      {/* Ruby Scripts Section */}
+      <RubyScriptsSection />
 
       {/* Troubleshooting Section */}
       <TroubleshootingSection />
