@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Plus, 
@@ -7,7 +7,10 @@ import {
   Droplets, 
   Ruler, 
   Mountain,
-  Info
+  Info,
+  Waves,
+  Play,
+  Pause
 } from "lucide-react";
 
 interface SurveyPoint {
@@ -43,7 +46,21 @@ export const CrossSectionEditor = () => {
   const [rightBank, setRightBank] = useState(50);
   const [selectedPoint, setSelectedPoint] = useState<string | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
+  const [manningN, setManningN] = useState(0.035); // Manning's roughness coefficient
+  const [channelSlope, setChannelSlope] = useState(0.001); // Bed slope (m/m)
+  const [showVelocityVectors, setShowVelocityVectors] = useState(true);
+  const [animationOffset, setAnimationOffset] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(true);
   const svgRef = useRef<SVGSVGElement>(null);
+
+  // Animate velocity vectors
+  useEffect(() => {
+    if (!isAnimating) return;
+    const interval = setInterval(() => {
+      setAnimationOffset((prev) => (prev + 1) % 100);
+    }, 50);
+    return () => clearInterval(interval);
+  }, [isAnimating]);
 
   // Calculate bounds
   const minX = Math.min(...points.map(p => p.x));
@@ -120,8 +137,40 @@ export const CrossSectionEditor = () => {
     const hydraulicRadius = wettedPerimeter > 0 ? area / wettedPerimeter : 0;
     const hydraulicDepth = topWidth > 0 ? area / topWidth : 0;
 
-    return { area, wettedPerimeter, topWidth, hydraulicRadius, hydraulicDepth };
-  }, [points, waterLevel]);
+    // Manning's equation: V = (1/n) * R^(2/3) * S^(1/2)
+    const velocity = manningN > 0 && hydraulicRadius > 0 && channelSlope > 0
+      ? (1 / manningN) * Math.pow(hydraulicRadius, 2/3) * Math.pow(channelSlope, 0.5)
+      : 0;
+    
+    // Discharge Q = V * A
+    const discharge = velocity * area;
+
+    // Froude number Fr = V / sqrt(g * D) where D is hydraulic depth
+    const g = 9.81;
+    const froudeNumber = hydraulicDepth > 0 ? velocity / Math.sqrt(g * hydraulicDepth) : 0;
+
+    return { area, wettedPerimeter, topWidth, hydraulicRadius, hydraulicDepth, velocity, discharge, froudeNumber };
+  }, [points, waterLevel, manningN, channelSlope]);
+
+  // Calculate velocity distribution across section (parabolic profile)
+  const calculateVelocityProfile = useCallback(() => {
+    const sortedPoints = [...points].sort((a, b) => a.x - b.x);
+    const velocityPoints: { x: number; y: number; velocity: number; depth: number }[] = [];
+    const props = calculateProperties();
+    const maxVelocity = props.velocity * 1.2; // Surface velocity slightly higher than mean
+
+    for (let i = 0; i < sortedPoints.length; i++) {
+      const p = sortedPoints[i];
+      if (p.y < waterLevel) {
+        const depth = waterLevel - p.y;
+        // Velocity profile: max at surface, zero at bed (logarithmic approximation simplified to parabolic)
+        const localVelocity = maxVelocity * (1 - Math.pow((waterLevel - p.y) / (waterLevel - Math.min(...points.map(pt => pt.y))), 0.5) * 0.15);
+        velocityPoints.push({ x: p.x, y: p.y, velocity: localVelocity, depth });
+      }
+    }
+
+    return velocityPoints;
+  }, [points, waterLevel, calculateProperties]);
 
   const properties = calculateProperties();
 
@@ -181,7 +230,82 @@ export const CrossSectionEditor = () => {
     setPoints(defaultPoints);
     setWaterLevel(99);
     setSelectedPoint(null);
+    setManningN(0.035);
+    setChannelSlope(0.001);
   };
+
+  // Generate velocity vectors for visualization
+  const generateVelocityVectors = useCallback(() => {
+    const sortedPoints = [...points].sort((a, b) => a.x - b.x);
+    const vectors: { x: number; y: number; velocity: number; length: number }[] = [];
+    const props = calculateProperties();
+    
+    if (props.velocity <= 0) return vectors;
+
+    // Find water boundaries
+    let leftWaterX = minX;
+    let rightWaterX = maxX;
+    
+    for (let i = 0; i < sortedPoints.length - 1; i++) {
+      const p1 = sortedPoints[i];
+      const p2 = sortedPoints[i + 1];
+      if (p1.y >= waterLevel && p2.y < waterLevel) {
+        const t = (waterLevel - p1.y) / (p2.y - p1.y);
+        leftWaterX = p1.x + t * (p2.x - p1.x);
+      }
+      if (p1.y < waterLevel && p2.y >= waterLevel) {
+        const t = (waterLevel - p1.y) / (p2.y - p1.y);
+        rightWaterX = p1.x + t * (p2.x - p1.x);
+      }
+    }
+
+    // Create grid of velocity vectors
+    const numCols = 8;
+    const numRows = 4;
+    const waterWidth = rightWaterX - leftWaterX;
+    
+    for (let col = 0; col < numCols; col++) {
+      const x = leftWaterX + (col + 0.5) * (waterWidth / numCols);
+      
+      // Find bed elevation at this x
+      let bedY = waterLevel;
+      for (let i = 0; i < sortedPoints.length - 1; i++) {
+        const p1 = sortedPoints[i];
+        const p2 = sortedPoints[i + 1];
+        if (p1.x <= x && p2.x >= x) {
+          const t = (x - p1.x) / (p2.x - p1.x);
+          bedY = p1.y + t * (p2.y - p1.y);
+          break;
+        }
+      }
+      
+      if (bedY >= waterLevel) continue;
+      
+      const localDepth = waterLevel - bedY;
+      
+      for (let row = 0; row < numRows; row++) {
+        const relativeDepth = (row + 0.5) / numRows;
+        const y = bedY + relativeDepth * localDepth;
+        
+        if (y >= waterLevel) continue;
+        
+        // Logarithmic velocity profile: faster near surface
+        const depthRatio = (y - bedY) / localDepth;
+        const velocityFactor = Math.log(1 + depthRatio * 30) / Math.log(31);
+        
+        // Reduce velocity near banks (lateral distribution)
+        const lateralPos = (x - leftWaterX) / waterWidth;
+        const lateralFactor = 1 - 0.4 * Math.pow(2 * lateralPos - 1, 2);
+        
+        const localVelocity = props.velocity * 1.2 * velocityFactor * lateralFactor;
+        const length = Math.min(localVelocity * 15, 25);
+        
+        vectors.push({ x, y, velocity: localVelocity, length });
+      }
+    }
+    
+    return vectors;
+  }, [points, waterLevel, calculateProperties, minX, maxX]);
 
   // Generate path for cross-section
   const sortedPoints = [...points].sort((a, b) => a.x - b.x);
@@ -233,6 +357,30 @@ export const CrossSectionEditor = () => {
             <h3 className="text-lg font-semibold text-foreground">Cross-Section Editor</h3>
             <div className="flex items-center gap-2">
               <button
+                onClick={() => setShowVelocityVectors(!showVelocityVectors)}
+                className={`p-2 rounded-lg transition-colors ${
+                  showVelocityVectors 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+                }`}
+                title="Toggle velocity vectors"
+              >
+                <Waves className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setIsAnimating(!isAnimating)}
+                disabled={!showVelocityVectors}
+                className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${
+                  isAnimating && showVelocityVectors
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+                }`}
+                title={isAnimating ? "Pause animation" : "Play animation"}
+              >
+                {isAnimating ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </button>
+              <div className="w-px h-6 bg-border mx-1" />
+              <button
                 onClick={addPoint}
                 className="p-2 rounded-lg bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors"
                 title="Add point"
@@ -281,6 +429,27 @@ export const CrossSectionEditor = () => {
               <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
                 <path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(210, 20%, 85%)" strokeWidth="0.5" />
               </pattern>
+              {/* Arrow marker for velocity vectors */}
+              <marker
+                id="arrowhead"
+                markerWidth="6"
+                markerHeight="4"
+                refX="5"
+                refY="2"
+                orient="auto"
+              >
+                <polygon points="0 0, 6 2, 0 4" fill="hsl(140, 70%, 35%)" />
+              </marker>
+              <marker
+                id="arrowhead-fast"
+                markerWidth="6"
+                markerHeight="4"
+                refX="5"
+                refY="2"
+                orient="auto"
+              >
+                <polygon points="0 0, 6 2, 0 4" fill="hsl(30, 90%, 50%)" />
+              </marker>
             </defs>
 
             {/* Grid */}
@@ -390,6 +559,44 @@ export const CrossSectionEditor = () => {
               strokeLinejoin="round"
             />
 
+            {/* Velocity vectors */}
+            {showVelocityVectors && generateVelocityVectors().map((vector, index) => {
+              const cx = toCanvasX(vector.x);
+              const cy = toCanvasY(vector.y);
+              const isFast = vector.velocity > properties.velocity;
+              const animatedOffset = (animationOffset * vector.velocity * 0.3) % 30;
+              
+              return (
+                <motion.g
+                  key={`velocity-${index}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.9 }}
+                  transition={{ delay: index * 0.02 }}
+                >
+                  {/* Animated flow line */}
+                  <line
+                    x1={cx - vector.length / 2 + animatedOffset}
+                    y1={cy}
+                    x2={cx + vector.length / 2 + animatedOffset}
+                    y2={cy}
+                    stroke={isFast ? "hsl(30, 90%, 50%)" : "hsl(140, 70%, 35%)"}
+                    strokeWidth={Math.max(1.5, vector.velocity * 1.5)}
+                    strokeLinecap="round"
+                    markerEnd={isFast ? "url(#arrowhead-fast)" : "url(#arrowhead)"}
+                    opacity={0.85}
+                  />
+                  {/* Secondary particle effect */}
+                  <circle
+                    cx={cx - vector.length / 3 + (animatedOffset * 1.2) % 40}
+                    cy={cy}
+                    r={1.5}
+                    fill={isFast ? "hsl(30, 90%, 60%)" : "hsl(140, 70%, 50%)"}
+                    opacity={0.6}
+                  />
+                </motion.g>
+              );
+            })}
+
             {/* Survey points */}
             {sortedPoints.map((point) => (
               <motion.g
@@ -421,20 +628,63 @@ export const CrossSectionEditor = () => {
             ))}
           </svg>
 
-          {/* Water Level Slider */}
-          <div className="mt-6 flex items-center gap-4">
-            <Droplets className="w-5 h-5 text-water" />
-            <span className="text-sm font-medium text-foreground w-28">Water Level:</span>
-            <input
-              type="range"
-              min={minY + 1}
-              max={maxY - 1}
-              step="0.1"
-              value={waterLevel}
-              onChange={(e) => setWaterLevel(parseFloat(e.target.value))}
-              className="flex-1 h-2 rounded-lg appearance-none bg-secondary cursor-pointer accent-water"
-            />
-            <span className="text-sm font-mono text-muted-foreground w-16">{waterLevel.toFixed(1)} m</span>
+          {/* Controls */}
+          <div className="mt-6 space-y-4">
+            {/* Water Level Slider */}
+            <div className="flex items-center gap-4">
+              <Droplets className="w-5 h-5 text-water" />
+              <span className="text-sm font-medium text-foreground w-28">Water Level:</span>
+              <input
+                type="range"
+                min={minY + 1}
+                max={maxY - 1}
+                step="0.1"
+                value={waterLevel}
+                onChange={(e) => setWaterLevel(parseFloat(e.target.value))}
+                className="flex-1 h-2 rounded-lg appearance-none bg-secondary cursor-pointer accent-water"
+              />
+              <span className="text-sm font-mono text-muted-foreground w-16">{waterLevel.toFixed(1)} m</span>
+            </div>
+
+            {/* Manning's n Slider */}
+            <div className="flex items-center gap-4">
+              <Waves className="w-5 h-5 text-primary" />
+              <span className="text-sm font-medium text-foreground w-28">Manning's n:</span>
+              <input
+                type="range"
+                min={0.01}
+                max={0.15}
+                step="0.001"
+                value={manningN}
+                onChange={(e) => setManningN(parseFloat(e.target.value))}
+                className="flex-1 h-2 rounded-lg appearance-none bg-secondary cursor-pointer accent-primary"
+              />
+              <span className="text-sm font-mono text-muted-foreground w-16">{manningN.toFixed(3)}</span>
+            </div>
+
+            {/* Bed Slope Slider */}
+            <div className="flex items-center gap-4">
+              <Mountain className="w-5 h-5 text-terrain" />
+              <span className="text-sm font-medium text-foreground w-28">Bed Slope:</span>
+              <input
+                type="range"
+                min={0.0001}
+                max={0.01}
+                step="0.0001"
+                value={channelSlope}
+                onChange={(e) => setChannelSlope(parseFloat(e.target.value))}
+                className="flex-1 h-2 rounded-lg appearance-none bg-secondary cursor-pointer accent-terrain"
+              />
+              <span className="text-sm font-mono text-muted-foreground w-20">{(channelSlope * 1000).toFixed(1)} ‰</span>
+            </div>
+          </div>
+
+          {/* Manning's Equation Display */}
+          <div className="mt-4 p-3 bg-secondary/50 rounded-lg border border-border">
+            <p className="text-xs text-muted-foreground mb-2">Manning's Equation:</p>
+            <p className="text-sm font-mono text-foreground">
+              V = (1/n) × R<sup>2/3</sup> × S<sup>1/2</sup> = (1/{manningN.toFixed(3)}) × {properties.hydraulicRadius.toFixed(3)}<sup>2/3</sup> × {channelSlope.toFixed(4)}<sup>1/2</sup>
+            </p>
           </div>
         </div>
 
@@ -480,6 +730,35 @@ export const CrossSectionEditor = () => {
             </div>
           </div>
 
+          {/* Flow Properties Panel */}
+          <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-5 border border-primary/20 shadow-lg">
+            <h4 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Waves className="w-4 h-4 text-primary" />
+              Flow Properties
+            </h4>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between items-center py-2 border-b border-primary/20">
+                <span className="text-sm text-muted-foreground">Mean Velocity</span>
+                <span className="text-sm font-mono font-bold text-primary">
+                  {properties.velocity.toFixed(3)} m/s
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-primary/20">
+                <span className="text-sm text-muted-foreground">Discharge (Q)</span>
+                <span className="text-sm font-mono font-bold text-primary">
+                  {properties.discharge.toFixed(3)} m³/s
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-sm text-muted-foreground">Froude Number</span>
+                <span className={`text-sm font-mono font-bold ${properties.froudeNumber > 1 ? 'text-orange-500' : 'text-green-600'}`}>
+                  {properties.froudeNumber.toFixed(3)} {properties.froudeNumber > 1 ? '(supercritical)' : '(subcritical)'}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-card rounded-xl p-5 border border-border shadow-lg">
             <h4 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
               <Mountain className="w-4 h-4 text-terrain" />
@@ -508,13 +787,28 @@ export const CrossSectionEditor = () => {
             </div>
           </div>
 
+          {/* Velocity Legend */}
+          <div className="bg-card rounded-xl p-4 border border-border shadow-lg">
+            <h4 className="text-xs font-semibold text-foreground mb-3">Velocity Legend</h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-1 bg-[hsl(140,70%,35%)] rounded-full" />
+                <span className="text-xs text-muted-foreground">Lower velocity (near bed/banks)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-1 bg-[hsl(30,90%,50%)] rounded-full" />
+                <span className="text-xs text-muted-foreground">Higher velocity (near surface)</span>
+              </div>
+            </div>
+          </div>
+
           <div className="bg-water-light rounded-xl p-4 border border-water/20">
             <div className="flex items-start gap-2">
               <Info className="w-4 h-4 text-water-dark flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-medium text-water-dark mb-1">Tip</p>
+                <p className="text-xs font-medium text-water-dark mb-1">Manning's Equation</p>
                 <p className="text-xs text-water-dark/80">
-                  Drag survey points to reshape the channel. Adjust the water level slider to see how hydraulic properties change.
+                  Velocity vectors show the flow distribution based on Manning's equation. Adjust roughness (n) and slope to see how velocity changes.
                 </p>
               </div>
             </div>
