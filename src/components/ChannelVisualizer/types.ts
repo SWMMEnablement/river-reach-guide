@@ -23,4 +23,4 @@ export interface HydraulicResults {
   conveyance: number;
 }
 
-export type ViewMode = 'cross-section' | 'long-profile' | 'plan-view';
+export type ViewMode = 'cross-section' | 'long-profile' | 'plan-view' | 'irregular-section' | 'bridge-culvert' | 'coupling-zones';
