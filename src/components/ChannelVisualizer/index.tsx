@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3 } from 'lucide-react';
+import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3, Box } from 'lucide-react';
 import { ViewMode, ChannelGeometry, HydraulicParams } from './types';
 import { useHydraulicCalculations } from './useHydraulicCalculations';
 import { CrossSectionView } from './CrossSectionView';
@@ -14,6 +14,8 @@ import { ResultsPanel } from './ResultsPanel';
 import { ICMConceptCard } from './ICMConceptCard';
 import { AdvancedConceptsSection } from './AdvancedConceptsSection';
 import { TroubleshootingSection } from './TroubleshootingSection';
+import { TwoDModelingSection } from './TwoDModelingSection';
+import { SWMM5ChannelsSection } from './SWMM5ChannelsSection';
 import RubyScriptsSection from './RubyScriptsSection';
 interface ChannelPreset {
   id: string;
@@ -301,6 +303,12 @@ export const ChannelVisualizer = () => {
 
       {/* Advanced Concepts Section */}
       <AdvancedConceptsSection />
+
+      {/* 2D Modeling Section */}
+      <TwoDModelingSection />
+
+      {/* SWMM5 Channels Section */}
+      <SWMM5ChannelsSection />
 
       {/* Ruby Scripts Section */}
       <RubyScriptsSection />
