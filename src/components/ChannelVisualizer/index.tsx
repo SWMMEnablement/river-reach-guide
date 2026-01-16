@@ -18,6 +18,8 @@ import { TwoDModelingSection } from './TwoDModelingSection';
 import { SWMM5ChannelsSection } from './SWMM5ChannelsSection';
 import { SWMM5ConduitsSection } from './SWMM5ConduitsSection';
 import { SuDSSection } from './SuDSSection';
+import { LIDControlsSection } from './LIDControlsSection';
+import { RatingCurveGenerator } from './RatingCurveGenerator';
 import RubyScriptsSection from './RubyScriptsSection';
 interface ChannelPreset {
   id: string;
@@ -317,6 +319,12 @@ export const ChannelVisualizer = () => {
 
       {/* SuDS Section */}
       <SuDSSection />
+
+      {/* LID Controls Section */}
+      <LIDControlsSection />
+
+      {/* Rating Curve Generator */}
+      <RatingCurveGenerator />
 
       {/* Ruby Scripts Section */}
       <RubyScriptsSection />
