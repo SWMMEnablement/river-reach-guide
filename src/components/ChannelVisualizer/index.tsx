@@ -13,6 +13,7 @@ import { ControlPanel } from './ControlPanel';
 import { ResultsPanel } from './ResultsPanel';
 import { ICMConceptCard } from './ICMConceptCard';
 import { AdvancedConceptsSection } from './AdvancedConceptsSection';
+import { TroubleshootingSection } from './TroubleshootingSection';
 interface ChannelPreset {
   id: string;
   name: string;
@@ -296,6 +297,9 @@ export const ChannelVisualizer = () => {
 
       {/* Advanced Concepts Section */}
       <AdvancedConceptsSection />
+
+      {/* Troubleshooting Section */}
+      <TroubleshootingSection />
     </div>
   );
 };
