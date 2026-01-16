@@ -23,6 +23,7 @@ import { RatingCurveGenerator } from './RatingCurveGenerator';
 import CulvertDesignCalculator from './CulvertDesignCalculator';
 import FroudeNumberCalculator from './FroudeNumberCalculator';
 import RubyScriptsSection from './RubyScriptsSection';
+import { HydraulicsAIChat } from './HydraulicsAIChat';
 interface ChannelPreset {
   id: string;
   name: string;
@@ -257,6 +258,9 @@ export const ChannelVisualizer = () => {
       {!['irregular-section', 'bridge-culvert', 'coupling-zones'].includes(viewMode) && (
         <ResultsPanel results={results} />
       )}
+
+      {/* AI Chat Assistant */}
+      <HydraulicsAIChat />
 
       {/* Autodesk InfoWorks ICM Concepts Section */}
       <div className="pt-6">
