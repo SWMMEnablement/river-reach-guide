@@ -26,6 +26,7 @@ import RubyScriptsSection from './RubyScriptsSection';
 import { ConceptFinder } from '@/components/ConceptFinder';
 import { GVFProfileCalculator } from './GVFProfileCalculator';
 import { WeirOrificeCalculator } from './WeirOrificeCalculator';
+import { QuickReferenceCard } from './QuickReferenceCard';
 interface ChannelPreset {
   id: string;
   name: string;
@@ -260,6 +261,12 @@ export const ChannelVisualizer = () => {
       {!['irregular-section', 'bridge-culvert', 'coupling-zones'].includes(viewMode) && (
         <ResultsPanel results={results} />
       )}
+
+      {/* Quick Reference Card & Concept Finder */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <QuickReferenceCard />
+        <span className="text-muted-foreground text-sm">Print a summary of key equations, Manning's n values & troubleshooting tips</span>
+      </div>
 
       {/* Concept Finder - Static Knowledge Base Search */}
       <ConceptFinder />
