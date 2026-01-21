@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
-import { RiverReachDiagram } from "@/components/RiverReachDiagram";
+import { GuidedRiverDiagram } from "@/components/GuidedDiagram";
 import { ModelingSteps } from "@/components/ModelingSteps";
 import { ComponentCard } from "@/components/ComponentCard";
 import { KnowledgeQuiz } from "@/components/KnowledgeQuiz";
@@ -75,7 +75,7 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <RiverReachDiagram />
+          <GuidedRiverDiagram />
         </div>
       </section>
 

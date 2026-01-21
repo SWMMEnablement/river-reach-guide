@@ -23,7 +23,7 @@ import { RatingCurveGenerator } from './RatingCurveGenerator';
 import CulvertDesignCalculator from './CulvertDesignCalculator';
 import FroudeNumberCalculator from './FroudeNumberCalculator';
 import RubyScriptsSection from './RubyScriptsSection';
-import { HydraulicsAIChat } from './HydraulicsAIChat';
+import { ConceptFinder } from '@/components/ConceptFinder';
 import { GVFProfileCalculator } from './GVFProfileCalculator';
 import { WeirOrificeCalculator } from './WeirOrificeCalculator';
 interface ChannelPreset {
