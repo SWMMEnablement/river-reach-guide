@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Circle, Square, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { CalculatorInsights, generateCulvertInsights } from './CalculatorInsights';
 
 interface CulvertParams {
   designFlow: number;        // m³/s
@@ -463,6 +464,19 @@ const CulvertDesignCalculator: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Interpretive Insights */}
+        <CalculatorInsights 
+          insights={generateCulvertInsights(
+            calculations.controlType,
+            calculations.inletControlHW,
+            calculations.outletControlHW,
+            calculations.capacityRatio,
+            calculations.froudeNumber,
+            calculations.isAdequate,
+            params.headwaterDepth
+          )}
+        />
 
         {/* Reference */}
         <div className="text-xs text-muted-foreground bg-muted/20 p-3 rounded-lg">

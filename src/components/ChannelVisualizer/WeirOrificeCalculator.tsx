@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CalculatorInsights, generateWeirInsights, generateOrificeInsights } from './CalculatorInsights';
 
 interface WeirType {
   id: string;
@@ -441,6 +442,11 @@ export const WeirOrificeCalculator = () => {
                   <path d="M 100 70 L 130 70 L 125 65 M 130 70 L 125 75" stroke="#0ea5e9" strokeWidth="2" fill="none" />
                 </svg>
               </div>
+
+              {/* Weir Interpretive Insights */}
+              <CalculatorInsights 
+                insights={generateWeirInsights(weirType, weirCalc.Q, weirHead, weirCalc.froudeApproach, weirCd)}
+              />
             </TabsContent>
 
             <TabsContent value="orifice" className="space-y-4">
@@ -628,6 +634,11 @@ export const WeirOrificeCalculator = () => {
                   <path d="M 220 145 L 250 155 L 245 150 M 250 155 L 245 160" stroke="#0ea5e9" strokeWidth="2" fill="none" />
                 </svg>
               </div>
+
+              {/* Orifice Interpretive Insights */}
+              <CalculatorInsights 
+                insights={generateOrificeInsights(orificeType, orificeCalc.Q, orificeCalc.velocity, orificeCd, orificeHead)}
+              />
             </TabsContent>
           </Tabs>
         </motion.div>
