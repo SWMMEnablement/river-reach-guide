@@ -33,6 +33,37 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Preview environments can suffer from stale service-worker caches after code updates,
+      // which may lead to React hook runtime errors. We proactively disable SW in preview.
+      (function () {
+        try {
+          var host = window.location.hostname || "";
+          var isPreview = host.includes("lovableproject.com") || host.startsWith("id-preview--");
+          if (!isPreview) return;
+
+          var key = "__sw_preview_cleared_v1";
+          if (sessionStorage.getItem(key) === "1") return;
+
+          if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              return Promise.all(regs.map(function (r) { return r.unregister(); }));
+            }).then(function () {
+              if ("caches" in window) {
+                return caches.keys().then(function (keys) {
+                  return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                });
+              }
+            }).finally(function () {
+              sessionStorage.setItem(key, "1");
+              window.location.reload();
+            });
+          }
+        } catch (e) {
+          // ignore
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

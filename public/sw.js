@@ -1,4 +1,5 @@
-const CACHE_NAME = 'river-reach-v1';
+// Bump cache version whenever caching strategy changes.
+const CACHE_NAME = 'river-reach-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -7,6 +8,13 @@ const STATIC_ASSETS = [
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png'
 ];
+
+// Allow the client to force-activate an updated service worker.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
@@ -40,38 +48,62 @@ self.addEventListener('fetch', (event) => {
   // Skip chrome-extension and other non-http requests
   if (!event.request.url.startsWith('http')) return;
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Return cached response and update cache in background
-        event.waitUntil(
-          fetch(event.request).then((networkResponse) => {
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+
+  // IMPORTANT: never cache JS/CSS bundles (prevents stale React runtime causing hook errors)
+  const dest = event.request.destination;
+  const isCodeAsset = dest === 'script' || dest === 'style' || dest === 'worker';
+
+  // Network-first for navigations to keep HTML/current chunks in sync.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          // Keep a simple offline shell cached.
+          const copy = networkResponse.clone();
+          event.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => cache.put('/', copy)).catch(() => {})
+          );
+          return networkResponse;
+        })
+        .catch(() => caches.match('/') )
+    );
+    return;
+  }
+
+  // Always go to network for code assets.
+  if (isCodeAsset) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // For same-origin static assets (images/fonts), use cache-first with background refresh.
+  if (isSameOrigin) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        const fetchAndCache = fetch(event.request)
+          .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
               caches.open(CACHE_NAME).then((cache) => {
                 cache.put(event.request, networkResponse.clone());
               });
             }
-          }).catch(() => {})
-        );
-        return cachedResponse;
-      }
+            return networkResponse;
+          })
+          .catch(() => null);
 
-      // Not in cache - fetch from network
-      return fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+        if (cachedResponse) {
+          event.waitUntil(fetchAndCache);
+          return cachedResponse;
         }
-        return networkResponse;
-      }).catch(() => {
-        // Return offline fallback for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-        return new Response('Offline', { status: 503 });
-      });
-    })
-  );
+
+        return fetchAndCache.then((r) => r || new Response('Offline', { status: 503 }));
+      })
+    );
+    return;
+  }
+
+  // Default: network
+  event.respondWith(fetch(event.request));
 });
