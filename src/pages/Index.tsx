@@ -5,6 +5,7 @@ import { ModelingSteps } from "@/components/ModelingSteps";
 import { ComponentCard } from "@/components/ComponentCard";
 import { KnowledgeQuiz } from "@/components/KnowledgeQuiz";
 import { ChannelVisualizer } from "@/components/ChannelVisualizer";
+import { LearningDashboard } from "@/components/LearningPathways";
 import { motion } from "framer-motion";
 import { 
   Circle, 
@@ -20,10 +21,27 @@ import {
 } from "lucide-react";
 
 const Index = () => {
+  const handleNavigateToSection = (sectionId: string) => {
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <HeroSection />
+
+      {/* Learning Pathways Dashboard */}
+      <section id="pathways" className="py-10 sm:py-16 lg:py-20 bg-secondary/30">
+        <div className="container mx-auto px-4 sm:px-6">
+          <LearningDashboard onNavigateToSection={handleNavigateToSection} />
+        </div>
+      </section>
 
       {/* Interactive Diagram Section */}
       <section id="diagram" className="py-10 sm:py-16 lg:py-24">
