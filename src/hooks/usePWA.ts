@@ -60,17 +60,48 @@ export const usePWA = () => {
 
 // Register service worker
 export const registerServiceWorker = async () => {
-  if ('serviceWorker' in navigator) {
+  // Avoid caching/dev preview issues: don't register SW outside production.
+  // Also proactively unregister any existing SWs in dev to prevent stale caches.
+  if (!import.meta.env.PROD) {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
-      });
-      console.log('SW registered:', registration.scope);
-      return registration;
-    } catch (error) {
-      console.error('SW registration failed:', error);
-      return null;
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch {
+      // ignore
     }
+    return null;
   }
-  return null;
+
+  if (!('serviceWorker' in navigator)) return null;
+
+  try {
+    const registration = await navigator.serviceWorker.register('/sw.js', {
+      scope: '/',
+    });
+
+    // If there's an updated SW waiting, activate it ASAP.
+    if (registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+
+    // When a new SW takes control, reload once to ensure all assets are in sync.
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloaded) return;
+      reloaded = true;
+      window.location.reload();
+    });
+
+    console.log('SW registered:', registration.scope);
+    return registration;
+  } catch (error) {
+    console.error('SW registration failed:', error);
+    return null;
+  }
 };
