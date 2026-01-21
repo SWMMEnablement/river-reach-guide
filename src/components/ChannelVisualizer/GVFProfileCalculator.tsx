@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
+import { CalculatorInsights, generateGVFInsights } from './CalculatorInsights';
 interface GVFPoint {
   x: number;
   y: number;
@@ -535,6 +535,11 @@ export const GVFProfileCalculator = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Interpretive Insights */}
+          <CalculatorInsights 
+            insights={generateGVFInsights(normalDepth, criticalDepth, isMild, selectedProfile, boundaryDepth)}
+          />
         </motion.div>
       )}
     </div>

@@ -6,6 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Waves, Zap, AlertTriangle, ArrowRight, TrendingDown, TrendingUp } from 'lucide-react';
+import { CalculatorInsights, generateFroudeInsights } from './CalculatorInsights';
 
 interface ChannelParams {
   bottomWidth: number;      // m
@@ -611,6 +612,19 @@ const FroudeNumberCalculator: React.FC = () => {
             </p>
           </TabsContent>
         </Tabs>
+
+        {/* Interpretive Insights */}
+        <CalculatorInsights 
+          insights={generateFroudeInsights(
+            calculations.froudeUpstream,
+            calculations.froudeDownstream,
+            calculations.normalDepth,
+            calculations.criticalDepth,
+            calculations.jumpOccurs,
+            calculations.sequentDepth,
+            calculations.energyLoss
+          )}
+        />
 
         {/* Reference */}
         <div className="text-xs text-muted-foreground bg-muted/20 p-3 rounded-lg">

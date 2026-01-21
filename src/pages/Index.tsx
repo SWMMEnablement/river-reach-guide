@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { RiverReachDiagram } from "@/components/RiverReachDiagram";
@@ -6,6 +7,7 @@ import { ComponentCard } from "@/components/ComponentCard";
 import { KnowledgeQuiz } from "@/components/KnowledgeQuiz";
 import { ChannelVisualizer } from "@/components/ChannelVisualizer";
 import { LearningDashboard } from "@/components/LearningPathways";
+import { StoryModeGuide, StoryModeButton } from "@/components/StoryMode";
 import { motion } from "framer-motion";
 import { 
   Circle, 
@@ -21,6 +23,8 @@ import {
 } from "lucide-react";
 
 const Index = () => {
+  const [isStoryModeActive, setIsStoryModeActive] = useState(false);
+
   const handleNavigateToSection = (sectionId: string) => {
     // Small delay to ensure DOM is ready
     setTimeout(() => {
@@ -36,9 +40,19 @@ const Index = () => {
       <Header />
       <HeroSection />
 
+      {/* Story Mode Guide */}
+      <StoryModeGuide 
+        isVisible={isStoryModeActive} 
+        onClose={() => setIsStoryModeActive(false)} 
+      />
+
       {/* Learning Pathways Dashboard */}
       <section id="pathways" className="py-10 sm:py-16 lg:py-20 bg-secondary/30">
         <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <div />
+            <StoryModeButton onClick={() => setIsStoryModeActive(true)} />
+          </div>
           <LearningDashboard onNavigateToSection={handleNavigateToSection} />
         </div>
       </section>
