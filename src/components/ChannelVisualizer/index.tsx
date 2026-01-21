@@ -261,8 +261,8 @@ export const ChannelVisualizer = () => {
         <ResultsPanel results={results} />
       )}
 
-      {/* AI Chat Assistant */}
-      <HydraulicsAIChat />
+      {/* Concept Finder - Static Knowledge Base Search */}
+      <ConceptFinder />
 
       {/* Autodesk InfoWorks ICM Concepts Section */}
       <div className="pt-6" id="icm-concepts">
