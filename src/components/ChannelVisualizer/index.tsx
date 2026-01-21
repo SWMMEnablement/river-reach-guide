@@ -265,7 +265,7 @@ export const ChannelVisualizer = () => {
       <HydraulicsAIChat />
 
       {/* Autodesk InfoWorks ICM Concepts Section */}
-      <div className="pt-6">
+      <div className="pt-6" id="icm-concepts">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="w-5 h-5 text-primary" />
           <h3 className="text-lg font-semibold text-foreground">Autodesk InfoWorks ICM Hydraulic Concepts</h3>
@@ -314,10 +314,14 @@ export const ChannelVisualizer = () => {
       </div>
 
       {/* Advanced Concepts Section */}
-      <AdvancedConceptsSection />
+      <div id="advanced-concepts">
+        <AdvancedConceptsSection />
+      </div>
 
       {/* 2D Modeling Section */}
-      <TwoDModelingSection />
+      <div id="2d-modeling">
+        <TwoDModelingSection />
+      </div>
 
       {/* SWMM5 Channels Section */}
       <SWMM5ChannelsSection />
@@ -335,13 +339,19 @@ export const ChannelVisualizer = () => {
       <RatingCurveGenerator />
 
       {/* Culvert Design Calculator */}
-      <CulvertDesignCalculator />
+      <div id="culvert-calculator">
+        <CulvertDesignCalculator />
+      </div>
 
       {/* Froude Number Calculator */}
-      <FroudeNumberCalculator />
+      <div id="froude-calculator">
+        <FroudeNumberCalculator />
+      </div>
 
       {/* GVF Profile Calculator */}
-      <GVFProfileCalculator />
+      <div id="gvf-calculator">
+        <GVFProfileCalculator />
+      </div>
 
       {/* Weir & Orifice Calculator */}
       <WeirOrificeCalculator />
@@ -350,7 +360,9 @@ export const ChannelVisualizer = () => {
       <RubyScriptsSection />
 
       {/* Troubleshooting Section */}
-      <TroubleshootingSection />
+      <div id="troubleshooting">
+        <TroubleshootingSection />
+      </div>
     </div>
   );
 };
