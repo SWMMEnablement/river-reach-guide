@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Circle, Square, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { CalculatorInsights, generateCulvertInsights } from './CalculatorInsights';
+import { CalculatorQuiz, culvertQuizQuestions } from './CalculatorQuiz';
 
 interface CulvertParams {
   designFlow: number;        // m³/s
@@ -476,6 +477,18 @@ const CulvertDesignCalculator: React.FC = () => {
             calculations.isAdequate,
             params.headwaterDepth
           )}
+        />
+
+        {/* Interactive Quiz */}
+        <CalculatorQuiz 
+          title="Culvert Design Quiz"
+          questions={culvertQuizQuestions}
+          calculatorValues={{
+            capacityRatio: calculations.capacityRatio,
+            controlType: calculations.controlType,
+            inletControlHW: calculations.inletControlHW,
+            outletControlHW: calculations.outletControlHW
+          }}
         />
 
         {/* Reference */}

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Waves, Zap, AlertTriangle, ArrowRight, TrendingDown, TrendingUp } from 'lucide-react';
 import { CalculatorInsights, generateFroudeInsights } from './CalculatorInsights';
+import { CalculatorQuiz, froudeQuizQuestions } from './CalculatorQuiz';
 
 interface ChannelParams {
   bottomWidth: number;      // m
@@ -624,6 +625,18 @@ const FroudeNumberCalculator: React.FC = () => {
             calculations.sequentDepth,
             calculations.energyLoss
           )}
+        />
+
+        {/* Interactive Quiz */}
+        <CalculatorQuiz 
+          title="Froude Number Quiz"
+          questions={froudeQuizQuestions}
+          calculatorValues={{
+            froudeUpstream: calculations.froudeUpstream,
+            froudeDownstream: calculations.froudeDownstream,
+            normalDepth: calculations.normalDepth,
+            criticalDepth: calculations.criticalDepth
+          }}
         />
 
         {/* Reference */}

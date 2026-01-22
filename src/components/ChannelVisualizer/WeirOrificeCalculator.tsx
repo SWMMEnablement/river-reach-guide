@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CalculatorInsights, generateWeirInsights, generateOrificeInsights } from './CalculatorInsights';
+import { CalculatorQuiz, weirOrificeQuizQuestions } from './CalculatorQuiz';
 
 interface WeirType {
   id: string;
@@ -641,6 +642,12 @@ export const WeirOrificeCalculator = () => {
               />
             </TabsContent>
           </Tabs>
+
+          {/* Interactive Quiz (shared for both tabs) */}
+          <CalculatorQuiz 
+            title="Weir & Orifice Quiz"
+            questions={weirOrificeQuizQuestions}
+          />
         </motion.div>
       )}
     </div>
