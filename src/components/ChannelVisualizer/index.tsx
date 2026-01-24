@@ -27,6 +27,7 @@ import { ConceptFinder } from '@/components/ConceptFinder';
 import { GVFProfileCalculator } from './GVFProfileCalculator';
 import { WeirOrificeCalculator } from './WeirOrificeCalculator';
 import { QuickReferenceCard } from './QuickReferenceCard';
+import { CompoundChannelCalculator } from './CompoundChannelCalculator';
 interface ChannelPreset {
   id: string;
   name: string;
@@ -362,6 +363,11 @@ export const ChannelVisualizer = () => {
 
       {/* Weir & Orifice Calculator */}
       <WeirOrificeCalculator />
+
+      {/* Compound Channel Calculator */}
+      <div id="compound-channel-calculator">
+        <CompoundChannelCalculator />
+      </div>
 
       {/* Ruby Scripts Section */}
       <RubyScriptsSection />
