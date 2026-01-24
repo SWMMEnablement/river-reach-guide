@@ -700,3 +700,102 @@ export const weirOrificeQuizQuestions: QuizQuestion[] = [
     hint: "The sloped sides add area to offset something else."
   }
 ];
+
+export const compoundChannelQuizQuestions: QuizQuestion[] = [
+  {
+    id: 1,
+    question: "In a compound channel with water on the floodplains, why is total discharge NOT simply Q = (1/n) × A × R^(2/3) × S^0.5 using total area?",
+    options: ["Manning's equation doesn't apply", "Different roughness zones require separate conveyance calculations (K = ΣKᵢ)", "Floodplains don't carry flow", "The bed slope is different on floodplains"],
+    correctIndex: 1,
+    explanation: "The Divided Channel Method (DCM) recognizes that zones with different roughness and geometry have different conveyances. Total K = K_main + K_left + K_right, then Q = K × S^0.5.",
+    hint: "Think about how roughness varies across the section."
+  },
+  {
+    id: 2,
+    question: "What does the kinetic energy correction factor α (Coriolis coefficient) account for?",
+    options: ["Bed roughness variations", "Non-uniform velocity distribution across the section", "Channel curvature effects", "Unsteady flow acceleration"],
+    correctIndex: 1,
+    explanation: "α corrects the kinetic energy term (αV²/2g) because V² averaged is not equal to (V_average)². For compound channels with fast main channel and slow floodplains, α can exceed 1.5.",
+    hint: "Consider what happens when velocities vary significantly across the cross-section."
+  },
+  {
+    id: 3,
+    question: "If α = 1.4 in a compound section, what does this mean for backwater calculations?",
+    options: ["Use 1.4 × V²/2g for kinetic energy head", "Multiply discharge by 1.4", "Reduce Manning's n by 40%", "α has no effect on backwater curves"],
+    correctIndex: 0,
+    explanation: "The energy equation uses α × V²/2g for velocity head. With α = 1.4, the kinetic energy is 40% higher than assuming uniform flow, significantly affecting water surface profiles.",
+    hint: "How does α appear in the energy equation?"
+  },
+  {
+    id: 4,
+    question: "When floodplain depth is shallow compared to main channel depth, what happens to the velocity ratio?",
+    options: ["Velocities become equal", "Main channel velocity >> floodplain velocity", "Floodplain velocity >> main channel velocity", "Velocity ratio is independent of depth"],
+    correctIndex: 1,
+    explanation: "Shallow floodplain flow has low hydraulic radius and often higher roughness, resulting in much lower velocities than the deeper main channel. This creates momentum exchange at the interface.",
+    hint: "Consider R^(2/3) term in Manning's equation and typical n values."
+  },
+  {
+    id: 5,
+    question: "What is the Lotter method used for in compound channel analysis?",
+    options: ["Calculating critical depth", "Computing composite Manning's n for the entire section", "Finding the energy gradient", "Determining bankfull discharge"],
+    correctIndex: 1,
+    explanation: "Lotter's method computes an equivalent composite n from individual zone roughness values weighted by wetted perimeter: n_composite = [(Σ Pᵢ × nᵢ^1.5) / P_total]^(2/3).",
+    hint: "It produces a single roughness value for a multi-zone section."
+  },
+  {
+    id: 6,
+    question: "Why might the Divided Channel Method underestimate head loss compared to observed data?",
+    options: ["It ignores bed friction", "It neglects momentum exchange at zone interfaces", "It overestimates floodplain roughness", "It uses incorrect slope values"],
+    correctIndex: 1,
+    explanation: "The DCM assumes independent parallel flow in each zone. In reality, fast main channel flow drags on slow floodplain flow, creating additional turbulence and energy loss at interfaces.",
+    hint: "What interaction does DCM ignore between zones?"
+  },
+  {
+    id: 7,
+    question: "The momentum correction factor β (Boussinesq coefficient) is used in which equation?",
+    options: ["Continuity equation", "Energy equation", "Momentum equation (e.g., hydraulic jump analysis)", "Manning's equation"],
+    correctIndex: 2,
+    explanation: "β corrects the momentum flux term (βρQV) for non-uniform velocity. It's essential for momentum-based calculations like hydraulic jumps in compound sections.",
+    hint: "Which fundamental equation deals with forces and momentum flux?"
+  },
+  {
+    id: 8,
+    question: "For a river with main channel n=0.035 and floodplain n=0.08, which zone contributes most to total conveyance during moderate overbank flow?",
+    options: ["Left floodplain", "Main channel", "Right floodplain", "All zones contribute equally"],
+    correctIndex: 1,
+    explanation: "The main channel typically has greater depth, larger hydraulic radius, and lower roughness, giving it much higher conveyance per unit area than shallow, rough floodplains.",
+    hint: "Conveyance K = (1/n) × A × R^(2/3). Which zone maximizes this?"
+  },
+  {
+    id: 9,
+    question: "In ICM/SWMM modeling, what is the 'Lateral Distribution Method' (LDM) for compound channels?",
+    options: ["Distributing inflows laterally along the channel", "Computing separate conveyances for each panel and summing them", "Averaging roughness across the section", "Splitting flow at junctions"],
+    correctIndex: 1,
+    explanation: "LDM divides the section into panels (typically at slope breaks), computes K for each panel using local n and geometry, then sums conveyances. It's the DCM implementation in 1D models.",
+    hint: "It's another name for the divided channel approach in 1D modeling."
+  },
+  {
+    id: 10,
+    question: "What happens to α as water level rises from bankfull to deep floodplain inundation?",
+    options: ["α increases continuously", "α decreases toward 1.0 as velocities become more uniform", "α stays constant", "α first increases then decreases"],
+    correctIndex: 3,
+    explanation: "At just-overbank levels, velocity differences are extreme (α highest). As floodplain depth increases, floodplain velocities increase, reducing the velocity gradient and α.",
+    hint: "Consider the velocity distribution at different flood stages."
+  },
+  {
+    id: 11,
+    question: "Why is the ASCE Task Force correction factor applied to compound channel conveyance?",
+    options: ["To account for meander effects", "To reduce conveyance for interface momentum losses (typically 5-10% reduction)", "To increase capacity for overbank storage", "To correct for measurement errors"],
+    correctIndex: 1,
+    explanation: "The ASCE correction reduces calculated conveyance to account for momentum exchange at main channel/floodplain interfaces, which the basic DCM ignores. Typical reduction is 5-10%.",
+    hint: "It addresses a limitation of the Divided Channel Method."
+  },
+  {
+    id: 12,
+    question: "For GVF calculations in a compound channel, which statement is correct?",
+    options: ["Use a single representative depth for the whole section", "Compute conveyance at each section using DCM, then apply standard step method", "Compound channels cannot have gradually varied flow", "Use only main channel properties"],
+    correctIndex: 1,
+    explanation: "Standard-step GVF uses total conveyance at each section. For compound channels, K = ΣKᵢ is computed using DCM, with α included in the energy equation velocity head term.",
+    hint: "How do you combine DCM with backwater calculations?"
+  }
+];
