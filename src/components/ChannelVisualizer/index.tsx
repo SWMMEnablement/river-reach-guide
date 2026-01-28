@@ -20,6 +20,7 @@ import { SWMM5ConduitsSection } from './SWMM5ConduitsSection';
 import { SuDSSection } from './SuDSSection';
 import { LIDControlsSection } from './LIDControlsSection';
 import { RatingCurveGenerator } from './RatingCurveGenerator';
+import { SWMMFileImport } from './SWMMFileImport';
 import CulvertDesignCalculator from './CulvertDesignCalculator';
 import FroudeNumberCalculator from './FroudeNumberCalculator';
 import RubyScriptsSection from './RubyScriptsSection';
@@ -369,6 +370,11 @@ export const ChannelVisualizer = () => {
                 transition={{ duration: 0.3 }}
                 className="space-y-6 pt-6"
               >
+                {/* SWMM File Import - Professional Workflow Integration */}
+                <div id="swmm-import">
+                  <SWMMFileImport />
+                </div>
+
                 {/* Advanced Concepts Section */}
                 <div id="advanced-concepts">
                   <AdvancedConceptsSection />
