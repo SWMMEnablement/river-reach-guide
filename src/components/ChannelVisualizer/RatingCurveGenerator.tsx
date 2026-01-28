@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Download, Plus, Trash2, Upload } from 'lucide-react';
+import { Calculator, Download, Plus, Trash2, Upload, Database } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { SWMMFileImport } from './SWMMFileImport';
+import { ICMDatabaseImport } from './ICMDatabaseImport';
 import { ReportGeneratorButton } from './ReportGeneratorButton';
 import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
 
@@ -12,14 +13,17 @@ interface ObservedPoint {
 }
 
 interface ImportedChannelData {
-  conduitName: string;
+  conduitName?: string;
+  itemName?: string;
   bottomWidth: number;
   sideSlope: number;
   manningN: number;
   bedSlope: number;
-  length: number;
-  shape: string;
+  length?: number;
+  shape?: string;
 }
+
+type ImportSource = 'none' | 'swmm' | 'icm';
 
 export const RatingCurveGenerator = () => {
   // Cross-section geometry
@@ -30,8 +34,9 @@ export const RatingCurveGenerator = () => {
   const [maxStage, setMaxStage] = useState(5);
   
   // Import state
-  const [showImport, setShowImport] = useState(false);
+  const [showImport, setShowImport] = useState<ImportSource>('none');
   const [importedFrom, setImportedFrom] = useState<string | null>(null);
+  const [importSource, setImportSource] = useState<'SWMM' | 'ICM' | null>(null);
   
   // Observed data points
   const [observedPoints, setObservedPoints] = useState<ObservedPoint[]>([
@@ -51,7 +56,18 @@ export const RatingCurveGenerator = () => {
     setSideSlope(data.sideSlope || 2);
     setManningN(data.manningN || 0.035);
     setBedSlope(data.bedSlope || 0.001);
-    setImportedFrom(data.conduitName);
+    setImportedFrom(data.conduitName || null);
+    setImportSource('SWMM');
+  }, []);
+
+  // Handle ICM import
+  const handleICMImport = useCallback((data: ImportedChannelData) => {
+    setBottomWidth(data.bottomWidth || 10);
+    setSideSlope(data.sideSlope || 2);
+    setManningN(data.manningN || 0.035);
+    setBedSlope(data.bedSlope || 0.001);
+    setImportedFrom(data.itemName || null);
+    setImportSource('ICM');
   }, []);
 
   // Calculate theoretical rating curve using Manning's equation
@@ -221,18 +237,30 @@ export const RatingCurveGenerator = () => {
           Generate stage-discharge relationships from cross-section geometry using Manning's equation 
           and compare with observed field measurements.
         </p>
-        <div className="flex items-center justify-center gap-3 mt-3">
-          {/* Import Button */}
+        <div className="flex items-center justify-center gap-3 mt-3 flex-wrap">
+          {/* SWMM Import Button */}
           <button
-            onClick={() => setShowImport(!showImport)}
+            onClick={() => setShowImport(showImport === 'swmm' ? 'none' : 'swmm')}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              showImport 
+              showImport === 'swmm'
                 ? 'bg-primary text-primary-foreground' 
                 : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
             }`}
           >
             <Upload className="w-4 h-4" />
-            {showImport ? 'Hide SWMM Import' : 'Import from SWMM .inp'}
+            {showImport === 'swmm' ? 'Hide SWMM Import' : 'Import SWMM .inp'}
+          </button>
+          {/* ICM Import Button */}
+          <button
+            onClick={() => setShowImport(showImport === 'icm' ? 'none' : 'icm')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              showImport === 'icm'
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+            }`}
+          >
+            <Database className="w-4 h-4" />
+            {showImport === 'icm' ? 'Hide ICM Import' : 'Import ICM .sqlite'}
           </button>
           <ReportGeneratorButton 
             calculatorType="Rating Curve Generator" 
@@ -241,19 +269,30 @@ export const RatingCurveGenerator = () => {
         </div>
         {importedFrom && (
           <p className="text-xs text-primary mt-2">
-            ✓ Loaded from: {importedFrom}
+            ✓ Loaded from {importSource}: {importedFrom}
           </p>
         )}
       </div>
 
       {/* SWMM Import Section */}
-      {showImport && (
+      {showImport === 'swmm' && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
         >
           <SWMMFileImport onImport={handleSWMMImport} />
+        </motion.div>
+      )}
+
+      {/* ICM Import Section */}
+      {showImport === 'icm' && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <ICMDatabaseImport onImport={handleICMImport} />
         </motion.div>
       )}
 

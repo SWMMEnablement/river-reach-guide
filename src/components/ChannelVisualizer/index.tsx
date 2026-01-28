@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3, ChevronDown, ChevronUp } from 'lucide-react';
+import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3, ChevronDown, ChevronUp, Database } from 'lucide-react';
 import { ViewMode, ChannelGeometry, HydraulicParams } from './types';
 import { useHydraulicCalculations } from './useHydraulicCalculations';
 import { CrossSectionView } from './CrossSectionView';
@@ -21,6 +21,7 @@ import { SuDSSection } from './SuDSSection';
 import { LIDControlsSection } from './LIDControlsSection';
 import { RatingCurveGenerator } from './RatingCurveGenerator';
 import { SWMMFileImport } from './SWMMFileImport';
+import { ICMDatabaseImport } from './ICMDatabaseImport';
 import CulvertDesignCalculator from './CulvertDesignCalculator';
 import FroudeNumberCalculator from './FroudeNumberCalculator';
 import RubyScriptsSection from './RubyScriptsSection';
@@ -370,9 +371,19 @@ export const ChannelVisualizer = () => {
                 transition={{ duration: 0.3 }}
                 className="space-y-6 pt-6"
               >
-                {/* SWMM File Import - Professional Workflow Integration */}
-                <div id="swmm-import">
-                  <SWMMFileImport />
+                {/* Professional Workflow Integration - Data Import */}
+                <div id="data-import" className="space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Database className="w-5 h-5 text-primary" />
+                    <h3 className="text-lg font-semibold text-foreground">Professional Data Import</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Load cross-section data directly from professional modeling software to populate calculators with real project data.
+                  </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <SWMMFileImport />
+                    <ICMDatabaseImport />
+                  </div>
                 </div>
 
                 {/* Advanced Concepts Section */}
