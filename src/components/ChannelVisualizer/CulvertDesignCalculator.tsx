@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Circle, Square, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { CalculatorInsights, generateCulvertInsights } from './CalculatorInsights';
 import { CalculatorQuiz, culvertQuizQuestions } from './CalculatorQuiz';
+import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
 
 interface CulvertParams {
   designFlow: number;        // m³/s
@@ -137,6 +139,82 @@ const CulvertDesignCalculator: React.FC = () => {
     };
   }, [params, dimensions, culvertType]);
 
+  // Report generator function
+  const getReportData = useCallback((metadata: { projectName: string; preparedBy: string; notes: string }): ReportData => {
+    const warnings: string[] = [];
+    if (!calculations.isAdequate) warnings.push('Culvert capacity is inadequate for design flow');
+    if (calculations.capacityRatio > 0.9) warnings.push('Near capacity - consider upsizing for safety margin');
+    if (calculations.froudeNumber > 1.5) warnings.push('High velocity flow - check outlet protection requirements');
+    
+    const entranceType = entranceTypes.find(e => e.value === params.entranceLossCoeff);
+    
+    return {
+      metadata: {
+        title: 'Culvert Hydraulic Analysis',
+        projectName: metadata.projectName,
+        preparedBy: metadata.preparedBy,
+        date: new Date(),
+        calculationType: 'Culvert Design Calculator (FHWA HY-8)',
+      },
+      inputs: {
+        title: 'Design Parameters',
+        items: [
+          { label: 'Culvert Type', value: culvertType === 'pipe' ? 'Circular Pipe' : 'Box Culvert', unit: '-' },
+          ...(culvertType === 'pipe' 
+            ? [{ label: 'Diameter', value: dimensions.diameter?.toString() || '', unit: 'm' }]
+            : [
+                { label: 'Width', value: dimensions.width?.toString() || '', unit: 'm' },
+                { label: 'Height', value: dimensions.height?.toString() || '', unit: 'm' },
+              ]),
+          { label: 'Design Flow (Q)', value: params.designFlow.toString(), unit: 'm³/s' },
+          { label: 'Headwater Depth', value: params.headwaterDepth.toString(), unit: 'm' },
+          { label: 'Tailwater Depth', value: params.tailwaterDepth.toString(), unit: 'm' },
+          { label: 'Culvert Length', value: params.culvertLength.toString(), unit: 'm' },
+          { label: 'Culvert Slope', value: (params.culvertSlope * 100).toFixed(1), unit: '%' },
+          { label: "Manning's n", value: params.manningN.toFixed(3), unit: '-' },
+          { label: 'Entrance Type', value: entranceType?.label || 'Custom', unit: '-' },
+          { label: 'Entrance Loss Coeff (Ke)', value: params.entranceLossCoeff.toString(), unit: '-' },
+        ],
+      },
+      results: [
+        {
+          title: 'Control Analysis',
+          items: [
+            { label: 'Inlet Control HW', value: calculations.inletControlHW.toFixed(3), unit: 'm' },
+            { label: 'Outlet Control HW', value: calculations.outletControlHW.toFixed(3), unit: 'm' },
+            { label: 'Controlling Condition', value: calculations.controlType.toUpperCase(), unit: '-' },
+            { label: 'Design HW', value: calculations.controllingHW.toFixed(3), unit: 'm' },
+          ],
+        },
+        {
+          title: 'Flow Characteristics',
+          items: [
+            { label: 'Flow Area', value: calculations.area.toFixed(3), unit: 'm²' },
+            { label: 'Flow Velocity', value: calculations.velocity.toFixed(3), unit: 'm/s' },
+            { label: 'Froude Number', value: calculations.froudeNumber.toFixed(3), unit: '-' },
+            { label: 'Capacity Ratio', value: (calculations.capacityRatio * 100).toFixed(1), unit: '%' },
+          ],
+        },
+        {
+          title: 'Head Losses',
+          items: [
+            { label: 'Entrance Loss', value: calculations.entranceLoss.toFixed(4), unit: 'm' },
+            { label: 'Friction Loss', value: calculations.frictionLoss.toFixed(4), unit: 'm' },
+            { label: 'Exit Loss', value: calculations.exitLoss.toFixed(4), unit: 'm' },
+            { label: 'Critical Depth', value: calculations.criticalDepth.toFixed(3), unit: 'm' },
+          ],
+        },
+      ],
+      methodology: [
+        METHODOLOGY_REFERENCES.culvertInlet,
+        METHODOLOGY_REFERENCES.culvertOutlet,
+        METHODOLOGY_REFERENCES.manning,
+      ],
+      notes: metadata.notes,
+      warnings,
+    };
+  }, [params, dimensions, culvertType, calculations, entranceTypes]);
+
   const renderCulvertDiagram = () => {
     const width = 400;
     const height = 200;
@@ -216,13 +294,21 @@ const CulvertDesignCalculator: React.FC = () => {
   return (
     <Card className="border-primary/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Circle className="w-5 h-5 text-primary" />
-          Culvert Design Calculator (HY-8 Method)
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Size box and pipe culverts using FHWA HY-8 methodology with inlet/outlet control analysis
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Circle className="w-5 h-5 text-primary" />
+              Culvert Design Calculator (HY-8 Method)
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Size box and pipe culverts using FHWA HY-8 methodology with inlet/outlet control analysis
+            </p>
+          </div>
+          <ReportGeneratorButton 
+            calculatorType="Culvert Design Calculator" 
+            getReportData={getReportData} 
+          />
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <Tabs value={culvertType} onValueChange={(v) => setCulvertType(v as CulvertType)}>
