@@ -7,7 +7,7 @@ import { ComponentCard } from "@/components/ComponentCard";
 import { KnowledgeQuiz } from "@/components/KnowledgeQuiz";
 import { ChannelVisualizer } from "@/components/ChannelVisualizer";
 import { LearningDashboard } from "@/components/LearningPathways";
-import { StoryModeGuide, StoryModeButton } from "@/components/StoryMode";
+import { StoryModeExperience, StoryModeButton } from "@/components/StoryMode";
 import { motion } from "framer-motion";
 import { 
   Circle, 
@@ -40,8 +40,8 @@ const Index = () => {
       <Header />
       <HeroSection />
 
-      {/* Story Mode Guide */}
-      <StoryModeGuide 
+      {/* Story Mode Experience */}
+      <StoryModeExperience 
         isVisible={isStoryModeActive} 
         onClose={() => setIsStoryModeActive(false)} 
       />
