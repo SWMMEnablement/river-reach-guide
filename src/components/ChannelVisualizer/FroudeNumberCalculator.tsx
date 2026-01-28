@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Waves, Zap, AlertTriangle, ArrowRight, TrendingDown, TrendingUp } from 'lucide-react';
 import { CalculatorInsights, generateFroudeInsights } from './CalculatorInsights';
 import { CalculatorQuiz, froudeQuizQuestions } from './CalculatorQuiz';
-
+import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
 interface ChannelParams {
   bottomWidth: number;      // m
   sideSlope: number;        // H:V
@@ -154,6 +155,70 @@ const FroudeNumberCalculator: React.FC = () => {
       criticalEnergy,
     };
   }, [params, analysisPosition]);
+
+  // Report generator function
+  const getReportData = useCallback((metadata: { projectName: string; preparedBy: string; notes: string }): ReportData => {
+    const warnings: string[] = [];
+    if (calculations.jumpOccurs) warnings.push('Hydraulic jump detected - verify energy dissipation capacity');
+    if (calculations.froudeUpstream > 2.5) warnings.push('High Froude number upstream - check for wave instability');
+    
+    return {
+      metadata: {
+        title: 'Froude Number & Flow Regime Analysis',
+        projectName: metadata.projectName,
+        preparedBy: metadata.preparedBy,
+        date: new Date(),
+        calculationType: 'Froude Number Calculator',
+      },
+      inputs: {
+        title: 'Input Parameters',
+        items: [
+          { label: 'Bottom Width (b)', value: params.bottomWidth.toString(), unit: 'm' },
+          { label: 'Side Slope (z)', value: `${params.sideSlope}:1`, unit: 'H:V' },
+          { label: 'Design Discharge (Q)', value: params.discharge.toString(), unit: 'm³/s' },
+          { label: 'Bed Slope (S₀)', value: params.bedSlope.toFixed(4), unit: 'm/m' },
+          { label: "Manning's n", value: params.manningN.toFixed(3), unit: '-' },
+          { label: 'Upstream Depth', value: params.upstreamDepth.toString(), unit: 'm' },
+          { label: 'Downstream Depth', value: params.downstreamDepth.toString(), unit: 'm' },
+        ],
+      },
+      results: [
+        {
+          title: 'Critical Flow Conditions',
+          items: [
+            { label: 'Critical Depth (yc)', value: calculations.criticalDepth.toFixed(3), unit: 'm' },
+            { label: 'Normal Depth (yn)', value: calculations.normalDepth.toFixed(3), unit: 'm' },
+            { label: 'Critical Energy', value: calculations.criticalEnergy.toFixed(3), unit: 'm' },
+          ],
+        },
+        {
+          title: 'Froude Number Analysis',
+          items: [
+            { label: 'Upstream Froude (Fr₁)', value: calculations.froudeUpstream.toFixed(3), unit: '-' },
+            { label: 'Downstream Froude (Fr₂)', value: calculations.froudeDownstream.toFixed(3), unit: '-' },
+            { label: 'Upstream Regime', value: calculations.regimeUpstream.toUpperCase(), unit: '-' },
+            { label: 'Downstream Regime', value: calculations.regimeDownstream.toUpperCase(), unit: '-' },
+          ],
+        },
+        ...(calculations.jumpOccurs ? [{
+          title: 'Hydraulic Jump Analysis',
+          items: [
+            { label: 'Jump Location', value: `${(calculations.jumpLocation * 100).toFixed(0)}%`, unit: 'of length' },
+            { label: 'Sequent Depth (y₂)', value: calculations.sequentDepth.toFixed(3), unit: 'm' },
+            { label: 'Energy Loss', value: calculations.energyLoss.toFixed(3), unit: 'm' },
+          ],
+        }] : []),
+      ],
+      methodology: [
+        METHODOLOGY_REFERENCES.froude,
+        METHODOLOGY_REFERENCES.criticalDepth,
+        METHODOLOGY_REFERENCES.manning,
+        ...(calculations.jumpOccurs ? [METHODOLOGY_REFERENCES.belanger] : []),
+      ],
+      notes: metadata.notes,
+      warnings,
+    };
+  }, [params, calculations]);
 
   const getRegimeColor = (regime: FlowRegime) => {
     switch (regime) {
@@ -338,13 +403,21 @@ const FroudeNumberCalculator: React.FC = () => {
   return (
     <Card className="border-primary/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Waves className="w-5 h-5 text-primary" />
-          Froude Number Calculator & Flow Regime Analyzer
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Analyze subcritical/supercritical flow regimes and hydraulic jump locations
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Waves className="w-5 h-5 text-primary" />
+              Froude Number Calculator & Flow Regime Analyzer
+            </CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Analyze subcritical/supercritical flow regimes and hydraulic jump locations
+            </p>
+          </div>
+          <ReportGeneratorButton 
+            calculatorType="Froude Number Calculator" 
+            getReportData={getReportData} 
+          />
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Channel Parameters */}

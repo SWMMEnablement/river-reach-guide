@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Calculator, Download, Plus, Trash2, Upload } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { SWMMFileImport } from './SWMMFileImport';
+import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
 
 interface ObservedPoint {
   stage: number;
@@ -126,6 +128,62 @@ export const RatingCurveGenerator = () => {
     return ssTot > 0 ? 1 - (ssRes / ssTot) : 0;
   }, [ratingCurveData]);
 
+  // Report generator function
+  const getReportData = useCallback((metadata: { projectName: string; preparedBy: string; notes: string }): ReportData => {
+    const warnings: string[] = [];
+    if (rSquared !== null && rSquared < 0.9) {
+      warnings.push(`Low R² value (${rSquared.toFixed(3)}) - significant deviation between theoretical and observed data`);
+    }
+    
+    // Get representative curve points
+    const curvePoints = ratingCurveData.filter((_, i) => i % 10 === 0 || i === ratingCurveData.length - 1);
+    
+    return {
+      metadata: {
+        title: 'Rating Curve Analysis',
+        projectName: metadata.projectName,
+        preparedBy: metadata.preparedBy,
+        date: new Date(),
+        calculationType: 'Rating Curve Generator',
+      },
+      inputs: {
+        title: 'Channel Geometry',
+        items: [
+          { label: 'Bottom Width (b)', value: bottomWidth.toString(), unit: 'm' },
+          { label: 'Side Slope (z)', value: `${sideSlope}:1`, unit: 'H:V' },
+          { label: "Manning's n", value: manningN.toFixed(3), unit: '-' },
+          { label: 'Bed Slope (S₀)', value: bedSlope.toFixed(4), unit: 'm/m' },
+          { label: 'Maximum Stage', value: maxStage.toString(), unit: 'm' },
+          ...(importedFrom ? [{ label: 'Data Source', value: `SWMM: ${importedFrom}`, unit: '-' }] : []),
+        ],
+      },
+      results: [
+        {
+          title: 'Curve Fit Statistics',
+          items: [
+            { label: 'Number of Observed Points', value: observedPoints.length.toString(), unit: 'points' },
+            { label: 'R² Coefficient', value: rSquared !== null ? rSquared.toFixed(4) : 'N/A', unit: '-' },
+            { label: 'Curve Points Generated', value: ratingCurveData.length.toString(), unit: 'points' },
+          ],
+        },
+        {
+          title: 'Stage-Discharge Summary',
+          items: curvePoints.slice(0, 6).map(p => ({
+            label: `Stage ${p.stage.toFixed(1)} m`,
+            value: p.theoretical.toFixed(2),
+            unit: 'm³/s',
+          })),
+        },
+      ],
+      methodology: [
+        METHODOLOGY_REFERENCES.ratingCurve,
+        METHODOLOGY_REFERENCES.manning,
+      ],
+      notes: metadata.notes + (observedPoints.length > 0 ? `\n\nObserved Data Points:\n${observedPoints.map(p => `Stage: ${p.stage}m, Q: ${p.discharge} m³/s`).join('\n')}` : ''),
+      warnings,
+    };
+  }, [bottomWidth, sideSlope, manningN, bedSlope, maxStage, observedPoints, ratingCurveData, rSquared, importedFrom]);
+
   const addObservedPoint = () => {
     const stage = parseFloat(newStage);
     const discharge = parseFloat(newDischarge);
@@ -163,18 +221,24 @@ export const RatingCurveGenerator = () => {
           Generate stage-discharge relationships from cross-section geometry using Manning's equation 
           and compare with observed field measurements.
         </p>
-        {/* Import Button */}
-        <button
-          onClick={() => setShowImport(!showImport)}
-          className={`mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            showImport 
-              ? 'bg-primary text-primary-foreground' 
-              : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
-          }`}
-        >
-          <Upload className="w-4 h-4" />
-          {showImport ? 'Hide SWMM Import' : 'Import from SWMM .inp'}
-        </button>
+        <div className="flex items-center justify-center gap-3 mt-3">
+          {/* Import Button */}
+          <button
+            onClick={() => setShowImport(!showImport)}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              showImport 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            {showImport ? 'Hide SWMM Import' : 'Import from SWMM .inp'}
+          </button>
+          <ReportGeneratorButton 
+            calculatorType="Rating Curve Generator" 
+            getReportData={getReportData} 
+          />
+        </div>
         {importedFrom && (
           <p className="text-xs text-primary mt-2">
             ✓ Loaded from: {importedFrom}

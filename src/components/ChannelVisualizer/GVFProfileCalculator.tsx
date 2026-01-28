@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Calculator, Play, RotateCcw, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalculatorInsights, generateGVFInsights } from './CalculatorInsights';
 import { CalculatorQuiz, gvfQuizQuestions } from './CalculatorQuiz';
+import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
 interface GVFPoint {
   x: number;
   y: number;
@@ -171,6 +173,65 @@ export const GVFProfileCalculator = () => {
 
   const { normalDepth, criticalDepth, isMild, profile, normalHydro, criticalHydro } = calculations;
 
+  // Report generator function
+  const getReportData = useCallback((metadata: { projectName: string; preparedBy: string; notes: string }): ReportData => {
+    const selectedProfileInfo = profileTypes.find(p => p.id === selectedProfile);
+    const warnings: string[] = [];
+    if (profile.some(p => p.froude > 1) && profile.some(p => p.froude < 1)) {
+      warnings.push('Profile crosses critical depth - potential hydraulic jump location');
+    }
+    
+    return {
+      metadata: {
+        title: `GVF Profile Analysis (${selectedProfile})`,
+        projectName: metadata.projectName,
+        preparedBy: metadata.preparedBy,
+        date: new Date(),
+        calculationType: 'GVF Profile Calculator',
+      },
+      inputs: {
+        title: 'Channel Parameters',
+        items: [
+          { label: 'Bottom Width (b)', value: bottomWidth.toString(), unit: 'm' },
+          { label: 'Side Slope (z)', value: `${sideSlope}:1`, unit: 'H:V' },
+          { label: 'Design Discharge (Q)', value: discharge.toString(), unit: 'm³/s' },
+          { label: 'Bed Slope (S₀)', value: bedSlope.toFixed(4), unit: 'm/m' },
+          { label: "Manning's n", value: manningN.toFixed(3), unit: '-' },
+          { label: 'Channel Length', value: channelLength.toString(), unit: 'm' },
+          { label: 'Boundary Depth', value: boundaryDepth.toString(), unit: 'm' },
+          { label: 'Profile Type', value: selectedProfile, unit: '-' },
+        ],
+      },
+      results: [
+        {
+          title: 'Reference Depths',
+          items: [
+            { label: 'Normal Depth (yn)', value: normalDepth.toFixed(3), unit: 'm' },
+            { label: 'Critical Depth (yc)', value: criticalDepth.toFixed(3), unit: 'm' },
+            { label: 'Slope Classification', value: isMild ? 'Mild (M)' : 'Steep (S)', unit: '-' },
+            { label: 'Profile Description', value: selectedProfileInfo?.description || '', unit: '-' },
+          ],
+        },
+        {
+          title: 'Hydraulic Properties at Normal Depth',
+          items: [
+            { label: 'Flow Area', value: normalHydro.A.toFixed(3), unit: 'm²' },
+            { label: 'Velocity', value: normalHydro.V.toFixed(3), unit: 'm/s' },
+            { label: 'Hydraulic Radius', value: normalHydro.R.toFixed(3), unit: 'm' },
+            { label: 'Froude Number', value: normalHydro.Fr.toFixed(3), unit: '-' },
+          ],
+        },
+      ],
+      methodology: [
+        METHODOLOGY_REFERENCES.gvf,
+        METHODOLOGY_REFERENCES.manning,
+        METHODOLOGY_REFERENCES.froude,
+      ],
+      notes: metadata.notes,
+      warnings,
+    };
+  }, [bottomWidth, sideSlope, discharge, bedSlope, manningN, channelLength, boundaryDepth, selectedProfile, calculations]);
+
   // SVG dimensions
   const svgWidth = 800;
   const svgHeight = 350;
@@ -217,6 +278,13 @@ export const GVFProfileCalculator = () => {
           animate={{ opacity: 1 }}
           className="p-4 border-t border-border space-y-4"
         >
+          {/* Export Button */}
+          <div className="flex justify-end">
+            <ReportGeneratorButton 
+              calculatorType="GVF Profile Calculator" 
+              getReportData={getReportData} 
+            />
+          </div>
           {/* Profile Type Selection */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
             {profileTypes.map(pt => (
