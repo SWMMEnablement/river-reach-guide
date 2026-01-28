@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Eye, Layers, Map, Play, Pause, RotateCcw, BookOpen, Calculator, Waves, Mountain, TreePine, Building2, Droplets, PenTool, Milestone, Grid3X3, ChevronDown, ChevronUp } from 'lucide-react';
 import { ViewMode, ChannelGeometry, HydraulicParams } from './types';
 import { useHydraulicCalculations } from './useHydraulicCalculations';
 import { CrossSectionView } from './CrossSectionView';
@@ -28,6 +28,9 @@ import { GVFProfileCalculator } from './GVFProfileCalculator';
 import { WeirOrificeCalculator } from './WeirOrificeCalculator';
 import { QuickReferenceCard } from './QuickReferenceCard';
 import { CompoundChannelCalculator } from './CompoundChannelCalculator';
+import { useBeginnerMode } from '@/hooks/useBeginnerMode';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
 interface ChannelPreset {
   id: string;
   name: string;
@@ -108,6 +111,10 @@ export const ChannelVisualizer = () => {
   const [showFloodplain, setShowFloodplain] = useState(true);
   const [isAnimating, setIsAnimating] = useState(true);
   const [activePreset, setActivePreset] = useState<string>('natural-river');
+  
+  // Beginner mode - collapse advanced sections
+  const { isBeginnerMode } = useBeginnerMode();
+  const [advancedOpen, setAdvancedOpen] = useState(!isBeginnerMode);
 
   const results = useHydraulicCalculations(geometry, params, showFloodplain);
 
@@ -123,14 +130,19 @@ export const ChannelVisualizer = () => {
     applyPreset(defaultPreset);
   };
 
-  const viewModes = [
-    { id: 'cross-section' as ViewMode, label: 'Cross-Section', shortLabel: 'Section', icon: Layers },
-    { id: 'long-profile' as ViewMode, label: 'Long Profile', shortLabel: 'Profile', icon: Eye },
-    { id: 'plan-view' as ViewMode, label: 'Plan View', shortLabel: 'Plan', icon: Map },
-    { id: 'irregular-section' as ViewMode, label: 'Irregular Section', shortLabel: 'Irregular', icon: PenTool },
-    { id: 'bridge-culvert' as ViewMode, label: 'Bridge/Culvert', shortLabel: 'Bridge', icon: Milestone },
-    { id: 'coupling-zones' as ViewMode, label: '1D/2D Coupling', shortLabel: '1D/2D', icon: Grid3X3 },
+  // View modes - filter to core views only in beginner mode
+  const allViewModes = [
+    { id: 'cross-section' as ViewMode, label: 'Cross-Section', shortLabel: 'Section', icon: Layers, core: true },
+    { id: 'long-profile' as ViewMode, label: 'Long Profile', shortLabel: 'Profile', icon: Eye, core: true },
+    { id: 'plan-view' as ViewMode, label: 'Plan View', shortLabel: 'Plan', icon: Map, core: true },
+    { id: 'irregular-section' as ViewMode, label: 'Irregular Section', shortLabel: 'Irregular', icon: PenTool, core: false },
+    { id: 'bridge-culvert' as ViewMode, label: 'Bridge/Culvert', shortLabel: 'Bridge', icon: Milestone, core: false },
+    { id: 'coupling-zones' as ViewMode, label: '1D/2D Coupling', shortLabel: '1D/2D', icon: Grid3X3, core: false },
   ];
+  
+  const viewModes = isBeginnerMode 
+    ? allViewModes.filter(m => m.core)
+    : allViewModes;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -321,61 +333,102 @@ export const ChannelVisualizer = () => {
         </div>
       </div>
 
-      {/* Advanced Concepts Section */}
-      <div id="advanced-concepts">
-        <AdvancedConceptsSection />
-      </div>
+      {/* Advanced Sections - Collapsible in Beginner Mode */}
+      <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center justify-between p-4 bg-card rounded-xl border border-border hover:border-primary/50 transition-colors mt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Calculator className="w-5 h-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-foreground">Advanced Tools & Calculators</h3>
+                <p className="text-sm text-muted-foreground">
+                  {isBeginnerMode 
+                    ? 'Expand to access 2D modeling, SWMM, SuDS, and specialized calculators' 
+                    : 'Specialized hydraulic calculators, SWMM/SuDS modules, and scripting tools'}
+                </p>
+              </div>
+            </div>
+            <motion.div
+              animate={{ rotate: advancedOpen ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            </motion.div>
+          </button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent>
+          <AnimatePresence>
+            {advancedOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6 pt-6"
+              >
+                {/* Advanced Concepts Section */}
+                <div id="advanced-concepts">
+                  <AdvancedConceptsSection />
+                </div>
 
-      {/* 2D Modeling Section */}
-      <div id="2d-modeling">
-        <TwoDModelingSection />
-      </div>
+                {/* 2D Modeling Section */}
+                <div id="2d-modeling">
+                  <TwoDModelingSection />
+                </div>
 
-      {/* SWMM5 Channels Section */}
-      <SWMM5ChannelsSection />
+                {/* SWMM5 Channels Section */}
+                <SWMM5ChannelsSection />
 
-      {/* SWMM5 Conduits Section */}
-      <SWMM5ConduitsSection />
+                {/* SWMM5 Conduits Section */}
+                <SWMM5ConduitsSection />
 
-      {/* SuDS Section */}
-      <SuDSSection />
+                {/* SuDS Section */}
+                <SuDSSection />
 
-      {/* LID Controls Section */}
-      <LIDControlsSection />
+                {/* LID Controls Section */}
+                <LIDControlsSection />
 
-      {/* Rating Curve Generator */}
-      <RatingCurveGenerator />
+                {/* Rating Curve Generator */}
+                <RatingCurveGenerator />
 
-      {/* Culvert Design Calculator */}
-      <div id="culvert-calculator">
-        <CulvertDesignCalculator />
-      </div>
+                {/* Culvert Design Calculator */}
+                <div id="culvert-calculator">
+                  <CulvertDesignCalculator />
+                </div>
 
-      {/* Froude Number Calculator */}
-      <div id="froude-calculator">
-        <FroudeNumberCalculator />
-      </div>
+                {/* Froude Number Calculator */}
+                <div id="froude-calculator">
+                  <FroudeNumberCalculator />
+                </div>
 
-      {/* GVF Profile Calculator */}
-      <div id="gvf-calculator">
-        <GVFProfileCalculator />
-      </div>
+                {/* GVF Profile Calculator */}
+                <div id="gvf-calculator">
+                  <GVFProfileCalculator />
+                </div>
 
-      {/* Weir & Orifice Calculator */}
-      <WeirOrificeCalculator />
+                {/* Weir & Orifice Calculator */}
+                <WeirOrificeCalculator />
 
-      {/* Compound Channel Calculator */}
-      <div id="compound-channel-calculator">
-        <CompoundChannelCalculator />
-      </div>
+                {/* Compound Channel Calculator */}
+                <div id="compound-channel-calculator">
+                  <CompoundChannelCalculator />
+                </div>
 
-      {/* Ruby Scripts Section */}
-      <RubyScriptsSection />
+                {/* Ruby Scripts Section */}
+                <RubyScriptsSection />
 
-      {/* Troubleshooting Section */}
-      <div id="troubleshooting">
-        <TroubleshootingSection />
-      </div>
+                {/* Troubleshooting Section */}
+                <div id="troubleshooting">
+                  <TroubleshootingSection />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };
