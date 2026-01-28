@@ -45,7 +45,9 @@ const speakerConfig = {
   mentor: { name: 'Dr. Sarah Chen', role: 'Senior Hydraulic Engineer', color: 'text-emerald-600 dark:text-emerald-400' },
   mayor: { name: 'Mayor Thompson', role: 'Riverside Town', color: 'text-amber-600 dark:text-amber-400' },
   engineer: { name: 'Tom Richards', role: 'Coastal Engineer', color: 'text-blue-600 dark:text-blue-400' },
-  narrator: { name: 'Narrator', role: '', color: 'text-muted-foreground' }
+  narrator: { name: 'Narrator', role: '', color: 'text-muted-foreground' },
+  operator: { name: 'Control Room Operator', role: 'Infrastructure Management', color: 'text-cyan-600 dark:text-cyan-400' },
+  resident: { name: 'Local Resident', role: 'Community Member', color: 'text-rose-600 dark:text-rose-400' }
 };
 
 export const StoryModeExperience = ({ isVisible, onClose, initialScenarioId }: StoryModeExperienceProps) => {
