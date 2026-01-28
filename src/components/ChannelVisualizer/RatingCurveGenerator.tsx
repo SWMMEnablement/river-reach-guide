@@ -1,11 +1,22 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Download, Plus, Trash2 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { Calculator, Download, Plus, Trash2, Upload } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { SWMMFileImport } from './SWMMFileImport';
 
 interface ObservedPoint {
   stage: number;
   discharge: number;
+}
+
+interface ImportedChannelData {
+  conduitName: string;
+  bottomWidth: number;
+  sideSlope: number;
+  manningN: number;
+  bedSlope: number;
+  length: number;
+  shape: string;
 }
 
 export const RatingCurveGenerator = () => {
@@ -15,6 +26,10 @@ export const RatingCurveGenerator = () => {
   const [manningN, setManningN] = useState(0.035);
   const [bedSlope, setBedSlope] = useState(0.001);
   const [maxStage, setMaxStage] = useState(5);
+  
+  // Import state
+  const [showImport, setShowImport] = useState(false);
+  const [importedFrom, setImportedFrom] = useState<string | null>(null);
   
   // Observed data points
   const [observedPoints, setObservedPoints] = useState<ObservedPoint[]>([
@@ -27,6 +42,15 @@ export const RatingCurveGenerator = () => {
   
   const [newStage, setNewStage] = useState('');
   const [newDischarge, setNewDischarge] = useState('');
+
+  // Handle SWMM import
+  const handleSWMMImport = useCallback((data: ImportedChannelData) => {
+    setBottomWidth(data.bottomWidth || 10);
+    setSideSlope(data.sideSlope || 2);
+    setManningN(data.manningN || 0.035);
+    setBedSlope(data.bedSlope || 0.001);
+    setImportedFrom(data.conduitName);
+  }, []);
 
   // Calculate theoretical rating curve using Manning's equation
   const ratingCurveData = useMemo(() => {
@@ -139,7 +163,35 @@ export const RatingCurveGenerator = () => {
           Generate stage-discharge relationships from cross-section geometry using Manning's equation 
           and compare with observed field measurements.
         </p>
+        {/* Import Button */}
+        <button
+          onClick={() => setShowImport(!showImport)}
+          className={`mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            showImport 
+              ? 'bg-primary text-primary-foreground' 
+              : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+          }`}
+        >
+          <Upload className="w-4 h-4" />
+          {showImport ? 'Hide SWMM Import' : 'Import from SWMM .inp'}
+        </button>
+        {importedFrom && (
+          <p className="text-xs text-primary mt-2">
+            ✓ Loaded from: {importedFrom}
+          </p>
+        )}
       </div>
+
+      {/* SWMM Import Section */}
+      {showImport && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <SWMMFileImport onImport={handleSWMMImport} />
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Controls Panel */}
@@ -227,7 +279,7 @@ export const RatingCurveGenerator = () => {
                   </span>
                   <button
                     onClick={() => removeObservedPoint(index)}
-                    className="p-1 text-red-500 hover:bg-red-100 rounded transition-colors"
+                    className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
