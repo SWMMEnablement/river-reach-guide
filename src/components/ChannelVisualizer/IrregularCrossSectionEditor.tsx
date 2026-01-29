@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Upload, Plus, Trash2, RotateCcw, MousePointer, Move } from 'lucide-react';
-
+import { ICMExportButton } from './ICMExportButton';
+import { exportCrossSectionCSV, ICMCrossSectionExport } from '@/lib/icm-csv-exporter';
 interface CrossSectionPoint {
   id: string;
   x: number; // chainage/offset from left (meters)
@@ -263,6 +264,23 @@ export const IrregularCrossSectionEditor = ({ onExport }: Props) => {
     onExport?.(csv);
   };
 
+  // ICM Export using new exporter
+  const handleICMCrossSectionExport = useCallback((options: { filename: string; sectionId: string }) => {
+    const sortedPoints = [...points].sort((a, b) => a.x - b.x);
+    const leftBankIdx = sortedPoints.findIndex(p => p.isBank === 'left');
+    const rightBankIdx = sortedPoints.findIndex(p => p.isBank === 'right');
+    
+    const sectionData: ICMCrossSectionExport = {
+      sectionId: options.sectionId,
+      points: sortedPoints.map(p => ({ x: p.x, z: p.z })),
+      leftBankIndex: leftBankIdx >= 0 ? leftBankIdx : undefined,
+      rightBankIndex: rightBankIdx >= 0 ? rightBankIdx : undefined,
+      manningN: 0.035, // Default value
+    };
+    
+    exportCrossSectionCSV([sectionData], { filename: options.filename });
+  }, [points]);
+
   // Import from CSV (basic parsing)
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -364,11 +382,17 @@ export const IrregularCrossSectionEditor = ({ onExport }: Props) => {
         
         <button
           onClick={exportToCSV}
-          className="flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+          className="flex items-center gap-2 px-3 py-2 rounded-md bg-secondary text-foreground hover:bg-secondary/80"
         >
           <Download className="w-4 h-4" />
-          <span className="text-sm">Export ICM CSV</span>
+          <span className="text-sm">Export CSV</span>
         </button>
+
+        <ICMExportButton
+          exportType="cross_section"
+          onExport={handleICMCrossSectionExport}
+          label="Export ICM"
+        />
       </div>
 
       {/* Main editor */}

@@ -8,7 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { CalculatorInsights, generateGVFInsights } from './CalculatorInsights';
 import { CalculatorQuiz, gvfQuizQuestions } from './CalculatorQuiz';
 import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ICMExportButton } from './ICMExportButton';
 import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
+import { exportWaterLevelProfileCSV, ICMWaterLevelExport } from '@/lib/icm-csv-exporter';
 interface GVFPoint {
   x: number;
   y: number;
@@ -232,6 +234,19 @@ export const GVFProfileCalculator = () => {
     };
   }, [bottomWidth, sideSlope, discharge, bedSlope, manningN, channelLength, boundaryDepth, selectedProfile, calculations]);
 
+  // ICM Export: Water Level Profile
+  const handleICMWaterLevelExport = useCallback((options: { filename: string; sectionId: string }) => {
+    const profileData: ICMWaterLevelExport[] = profile.map(p => ({
+      reachId: options.sectionId,
+      chainage: p.x,
+      waterLevel: p.depth,
+      bedLevel: 0 - bedSlope * p.x,
+      velocity: p.velocity,
+      froudeNumber: p.froude,
+    }));
+    exportWaterLevelProfileCSV(profileData, { filename: options.filename });
+  }, [profile, bedSlope]);
+
   // SVG dimensions
   const svgWidth = 800;
   const svgHeight = 350;
@@ -278,8 +293,13 @@ export const GVFProfileCalculator = () => {
           animate={{ opacity: 1 }}
           className="p-4 border-t border-border space-y-4"
         >
-          {/* Export Button */}
-          <div className="flex justify-end">
+          {/* Export Buttons */}
+          <div className="flex justify-end gap-2 flex-wrap">
+            <ICMExportButton
+              exportType="water_level_profile"
+              onExport={handleICMWaterLevelExport}
+              label="Export ICM Profile"
+            />
             <ReportGeneratorButton 
               calculatorType="GVF Profile Calculator" 
               getReportData={getReportData} 
