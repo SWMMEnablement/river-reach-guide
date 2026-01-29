@@ -30,6 +30,8 @@ import { GVFProfileCalculator } from './GVFProfileCalculator';
 import { WeirOrificeCalculator } from './WeirOrificeCalculator';
 import { QuickReferenceCard } from './QuickReferenceCard';
 import { CompoundChannelCalculator } from './CompoundChannelCalculator';
+import { TroubleshootingAIChat } from './TroubleshootingAIChat';
+import { HydraulicsAIChat } from './HydraulicsAIChat';
 import { useBeginnerMode } from '@/hooks/useBeginnerMode';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
@@ -436,6 +438,21 @@ export const ChannelVisualizer = () => {
 
                 {/* Ruby Scripts Section */}
                 <RubyScriptsSection />
+
+                {/* AI Assistants Section */}
+                <div id="ai-assistants" className="space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calculator className="w-5 h-5 text-primary" />
+                    <h3 className="text-lg font-semibold text-foreground">AI-Powered Assistants</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Get instant help from AI specialists for troubleshooting modeling issues or learning hydraulic concepts.
+                  </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <TroubleshootingAIChat />
+                    <HydraulicsAIChat />
+                  </div>
+                </div>
 
                 {/* Troubleshooting Section */}
                 <div id="troubleshooting">
