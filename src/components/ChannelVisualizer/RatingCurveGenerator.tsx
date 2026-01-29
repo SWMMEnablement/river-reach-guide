@@ -5,8 +5,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { SWMMFileImport } from './SWMMFileImport';
 import { ICMDatabaseImport } from './ICMDatabaseImport';
 import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ICMExportButton } from './ICMExportButton';
 import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
-
+import { exportRatingCurveCSV, exportChannelPropertiesCSV, ICMRatingCurveExport, ICMChannelExport } from '@/lib/icm-csv-exporter';
 interface ObservedPoint {
   stage: number;
   discharge: number;
@@ -229,6 +230,33 @@ export const RatingCurveGenerator = () => {
     URL.revokeObjectURL(url);
   };
 
+  // ICM Export: Rating Curve
+  const handleICMRatingCurveExport = useCallback((options: { filename: string; sectionId: string }) => {
+    const curveData: ICMRatingCurveExport = {
+      nodeId: options.sectionId,
+      curveType: 'STAGE_DISCHARGE',
+      points: ratingCurveData.map(d => ({
+        stage: d.stage,
+        value: d.theoretical,
+      })),
+    };
+    exportRatingCurveCSV([curveData], { filename: options.filename });
+  }, [ratingCurveData]);
+
+  // ICM Export: Channel Properties
+  const handleICMChannelExport = useCallback((options: { filename: string; sectionId: string }) => {
+    const channelData: ICMChannelExport = {
+      id: options.sectionId,
+      length: 100, // Default length
+      shape: 'TRAPEZOIDAL',
+      bottomWidth,
+      sideSlope,
+      manningN,
+      bedSlope,
+    };
+    exportChannelPropertiesCSV([channelData], { filename: options.filename });
+  }, [bottomWidth, sideSlope, manningN, bedSlope]);
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -439,6 +467,23 @@ export const RatingCurveGenerator = () => {
             <Download className="w-4 h-4" />
             Export CSV
           </button>
+
+          {/* ICM Export Buttons */}
+          <div className="space-y-2 pt-2 border-t border-border">
+            <p className="text-xs text-muted-foreground font-medium">ICM Export</p>
+            <div className="flex flex-col gap-2">
+              <ICMExportButton
+                exportType="rating_curve"
+                onExport={handleICMRatingCurveExport}
+                label="Export Rating Curve"
+              />
+              <ICMExportButton
+                exportType="channel_properties"
+                onExport={handleICMChannelExport}
+                label="Export Channel Props"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Chart Panel */}

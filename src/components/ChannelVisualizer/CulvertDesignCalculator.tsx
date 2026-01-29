@@ -9,7 +9,9 @@ import { Circle, Square, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { CalculatorInsights, generateCulvertInsights } from './CalculatorInsights';
 import { CalculatorQuiz, culvertQuizQuestions } from './CalculatorQuiz';
 import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ICMExportButton } from './ICMExportButton';
 import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
+import { exportCulvertDesignCSV, ICMCulvertExport } from '@/lib/icm-csv-exporter';
 
 interface CulvertParams {
   designFlow: number;        // m³/s
@@ -215,6 +217,32 @@ const CulvertDesignCalculator: React.FC = () => {
     };
   }, [params, dimensions, culvertType, calculations, entranceTypes]);
 
+  // ICM Export: Culvert Design
+  const handleICMCulvertExport = useCallback((options: { filename: string; sectionId: string }) => {
+    const entranceType = entranceTypes.find(e => e.value === params.entranceLossCoeff);
+    
+    const culvertData: ICMCulvertExport = {
+      id: options.sectionId,
+      type: culvertType === 'pipe' ? 'PIPE' : 'BOX',
+      diameter: culvertType === 'pipe' ? dimensions.diameter : undefined,
+      width: culvertType === 'box' ? dimensions.width : undefined,
+      height: culvertType === 'box' ? dimensions.height : undefined,
+      length: params.culvertLength,
+      usInvert: 0,
+      dsInvert: -params.culvertSlope * params.culvertLength,
+      manningN: params.manningN,
+      entranceType: entranceType?.label || 'Custom',
+      entranceLossCoeff: params.entranceLossCoeff,
+      designFlow: params.designFlow,
+      headwater: calculations.controllingHW,
+      tailwater: params.tailwaterDepth,
+      controlType: calculations.controlType.toUpperCase(),
+      velocity: calculations.velocity,
+      froudeNumber: calculations.froudeNumber,
+    };
+    exportCulvertDesignCSV([culvertData], { filename: options.filename });
+  }, [params, dimensions, culvertType, calculations, entranceTypes]);
+
   const renderCulvertDiagram = () => {
     const width = 400;
     const height = 200;
@@ -304,10 +332,17 @@ const CulvertDesignCalculator: React.FC = () => {
               Size box and pipe culverts using FHWA HY-8 methodology with inlet/outlet control analysis
             </p>
           </div>
-          <ReportGeneratorButton 
-            calculatorType="Culvert Design Calculator" 
-            getReportData={getReportData} 
-          />
+          <div className="flex gap-2 flex-wrap">
+            <ICMExportButton
+              exportType="culvert_design"
+              onExport={handleICMCulvertExport}
+              label="Export ICM Culvert"
+            />
+            <ReportGeneratorButton 
+              calculatorType="Culvert Design Calculator" 
+              getReportData={getReportData} 
+            />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">

@@ -9,7 +9,9 @@ import { Waves, Zap, AlertTriangle, ArrowRight, TrendingDown, TrendingUp } from 
 import { CalculatorInsights, generateFroudeInsights } from './CalculatorInsights';
 import { CalculatorQuiz, froudeQuizQuestions } from './CalculatorQuiz';
 import { ReportGeneratorButton } from './ReportGeneratorButton';
+import { ICMExportButton } from './ICMExportButton';
 import { ReportData, METHODOLOGY_REFERENCES } from '@/lib/pdf-report-generator';
+import { exportFroudeAnalysisCSV, exportChannelPropertiesCSV, ICMFroudeAnalysisExport, ICMChannelExport } from '@/lib/icm-csv-exporter';
 interface ChannelParams {
   bottomWidth: number;      // m
   sideSlope: number;        // H:V
@@ -220,6 +222,61 @@ const FroudeNumberCalculator: React.FC = () => {
     };
   }, [params, calculations]);
 
+  // ICM Export: Froude Analysis
+  const handleICMFroudeExport = useCallback((options: { filename: string; sectionId: string }) => {
+    const g = 9.81;
+    
+    // Calculate upstream values
+    const areaUpstream = (params.bottomWidth + params.sideSlope * params.upstreamDepth) * params.upstreamDepth;
+    const velocityUpstream = params.discharge / areaUpstream;
+    const energyUpstream = params.upstreamDepth + Math.pow(velocityUpstream, 2) / (2 * g);
+    
+    // Calculate downstream values
+    const areaDownstream = (params.bottomWidth + params.sideSlope * params.downstreamDepth) * params.downstreamDepth;
+    const velocityDownstream = params.discharge / areaDownstream;
+    const energyDownstream = params.downstreamDepth + Math.pow(velocityDownstream, 2) / (2 * g);
+    
+    const analysisData: ICMFroudeAnalysisExport[] = [
+      {
+        sectionId: options.sectionId,
+        chainage: 0,
+        depth: params.upstreamDepth,
+        velocity: velocityUpstream,
+        froudeNumber: calculations.froudeUpstream,
+        flowRegime: calculations.regimeUpstream.toUpperCase() as 'SUBCRITICAL' | 'CRITICAL' | 'SUPERCRITICAL',
+        criticalDepth: calculations.criticalDepth,
+        normalDepth: calculations.normalDepth,
+        specificEnergy: energyUpstream,
+      },
+      {
+        sectionId: options.sectionId,
+        chainage: 100,
+        depth: params.downstreamDepth,
+        velocity: velocityDownstream,
+        froudeNumber: calculations.froudeDownstream,
+        flowRegime: calculations.regimeDownstream.toUpperCase() as 'SUBCRITICAL' | 'CRITICAL' | 'SUPERCRITICAL',
+        criticalDepth: calculations.criticalDepth,
+        normalDepth: calculations.normalDepth,
+        specificEnergy: energyDownstream,
+      },
+    ];
+    exportFroudeAnalysisCSV(analysisData, { filename: options.filename });
+  }, [params, calculations]);
+
+  // ICM Export: Channel Properties
+  const handleICMChannelExport = useCallback((options: { filename: string; sectionId: string }) => {
+    const channelData: ICMChannelExport = {
+      id: options.sectionId,
+      length: 100,
+      shape: 'TRAPEZOIDAL',
+      bottomWidth: params.bottomWidth,
+      sideSlope: params.sideSlope,
+      manningN: params.manningN,
+      bedSlope: params.bedSlope,
+    };
+    exportChannelPropertiesCSV([channelData], { filename: options.filename });
+  }, [params]);
+
   const getRegimeColor = (regime: FlowRegime) => {
     switch (regime) {
       case 'subcritical': return 'bg-blue-500';
@@ -413,10 +470,22 @@ const FroudeNumberCalculator: React.FC = () => {
               Analyze subcritical/supercritical flow regimes and hydraulic jump locations
             </p>
           </div>
-          <ReportGeneratorButton 
-            calculatorType="Froude Number Calculator" 
-            getReportData={getReportData} 
-          />
+          <div className="flex gap-2 flex-wrap">
+            <ICMExportButton
+              exportType="froude_analysis"
+              onExport={handleICMFroudeExport}
+              label="Export Froude Analysis"
+            />
+            <ICMExportButton
+              exportType="channel_properties"
+              onExport={handleICMChannelExport}
+              label="Export Channel Props"
+            />
+            <ReportGeneratorButton 
+              calculatorType="Froude Number Calculator" 
+              getReportData={getReportData} 
+            />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
