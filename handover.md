@@ -372,7 +372,7 @@ The app will be available at `http://localhost:5173`.
 
 ---
 
-## 12. Deployment
+## 13. Deployment
 
 The app is deployed via Lovable's built-in publishing. To publish:
 1. Open the project in Lovable
