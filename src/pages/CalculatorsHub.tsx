@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calculator, TrendingUp, Circle, Waves, Layers, Droplets } from "lucide-react";
+import { Calculator, TrendingUp, Circle, Waves, Layers, Droplets, Zap } from "lucide-react";
 
 const calculators = [
   {
