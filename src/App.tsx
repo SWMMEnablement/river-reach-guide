@@ -19,6 +19,7 @@ const FroudePage = lazy(() => import("./pages/calculators/FroudePage"));
 const GVFPage = lazy(() => import("./pages/calculators/GVFPage"));
 const WeirPage = lazy(() => import("./pages/calculators/WeirPage"));
 const CompoundPage = lazy(() => import("./pages/calculators/CompoundPage"));
+const HydraulicJumpPage = lazy(() => import("./pages/calculators/HydraulicJumpPage"));
 const LearnPathwayPage = lazy(() => import("./pages/learn/LearnPathwayPage"));
 const ConceptsPage = lazy(() => import("./pages/reference/ConceptsPage"));
 const RubyScriptsPage = lazy(() => import("./pages/reference/RubyScriptsPage"));
@@ -51,6 +52,7 @@ const AppContent = () => {
             <Route path="/calculators/gvf" element={<GVFPage />} />
             <Route path="/calculators/weir" element={<WeirPage />} />
             <Route path="/calculators/compound" element={<CompoundPage />} />
+            <Route path="/calculators/hydraulic-jump" element={<HydraulicJumpPage />} />
             <Route path="/learn/:pathwayId" element={<LearnPathwayPage />} />
             <Route path="/reference/concepts" element={<ConceptsPage />} />
             <Route path="/reference/ruby-scripts" element={<RubyScriptsPage />} />

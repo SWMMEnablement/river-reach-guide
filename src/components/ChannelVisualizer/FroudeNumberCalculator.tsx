@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Waves, Zap, AlertTriangle, ArrowRight, TrendingDown, TrendingUp } from 'lucide-react';
+import { Waves, Zap, AlertTriangle, ArrowRight, TrendingDown, TrendingUp, ExternalLink } from 'lucide-react';
 import { CalculatorInsights, generateFroudeInsights } from './CalculatorInsights';
+import { Link } from 'react-router-dom';
 import { CalculatorQuiz, froudeQuizQuestions } from './CalculatorQuiz';
 import { ReportGeneratorButton } from './ReportGeneratorButton';
 import { ICMExportButton } from './ICMExportButton';
@@ -681,6 +682,13 @@ const FroudeNumberCalculator: React.FC = () => {
               <p className="text-xs text-muted-foreground">
                 Sequent depth calculated using Bélanger equation: y₂/y₁ = 0.5(√(1 + 8Fr₁²) - 1)
               </p>
+              <Link
+                to={`/calculators/hydraulic-jump?b=${params.bottomWidth}&z=${params.sideSlope}&Q=${params.discharge}&y1=${params.upstreamDepth}`}
+                className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Open Hydraulic Jump Calculator with these values
+              </Link>
             </CardContent>
           </Card>
         )}

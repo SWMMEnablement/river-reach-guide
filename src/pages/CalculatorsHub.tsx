@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calculator, TrendingUp, Circle, Waves, Layers, Droplets } from "lucide-react";
+import { Calculator, TrendingUp, Circle, Waves, Layers, Droplets, Zap } from "lucide-react";
 
 const calculators = [
   {
@@ -44,6 +44,13 @@ const calculators = [
     href: "/calculators/compound",
     icon: Layers,
     color: "terrain",
+  },
+  {
+    title: "Hydraulic Jump Calculator",
+    description: "Bélanger equation, sequent depth, energy loss, jump classification & stilling basin guidance.",
+    href: "/calculators/hydraulic-jump",
+    icon: Zap,
+    color: "node",
   },
 ];
 
