@@ -61,10 +61,11 @@ const jumpInfo: Record<JumpClassification, { label: string; color: string; descr
 };
 
 const HydraulicJumpCalculator: React.FC = () => {
-  const [bottomWidth, setBottomWidth] = useState(5.0);
-  const [sideSlope, setSideSlope] = useState(0); // 0 = rectangular
-  const [discharge, setDischarge] = useState(15.0);
-  const [y1, setY1] = useState(0.3);
+  const [searchParams] = useSearchParams();
+  const [bottomWidth, setBottomWidth] = useState(parseFloat(searchParams.get('b') || '') || 5.0);
+  const [sideSlope, setSideSlope] = useState(parseFloat(searchParams.get('z') || '') || 0);
+  const [discharge, setDischarge] = useState(parseFloat(searchParams.get('Q') || '') || 15.0);
+  const [y1, setY1] = useState(parseFloat(searchParams.get('y1') || '') || 0.3);
 
   const result = useMemo<JumpResult | null>(() => {
     const g = 9.81;
