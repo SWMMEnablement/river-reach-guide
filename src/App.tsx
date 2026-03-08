@@ -52,6 +52,7 @@ const AppContent = () => {
             <Route path="/calculators/gvf" element={<GVFPage />} />
             <Route path="/calculators/weir" element={<WeirPage />} />
             <Route path="/calculators/compound" element={<CompoundPage />} />
+            <Route path="/calculators/hydraulic-jump" element={<HydraulicJumpPage />} />
             <Route path="/learn/:pathwayId" element={<LearnPathwayPage />} />
             <Route path="/reference/concepts" element={<ConceptsPage />} />
             <Route path="/reference/ruby-scripts" element={<RubyScriptsPage />} />

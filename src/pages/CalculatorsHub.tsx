@@ -45,6 +45,13 @@ const calculators = [
     icon: Layers,
     color: "terrain",
   },
+  {
+    title: "Hydraulic Jump Calculator",
+    description: "Bélanger equation, sequent depth, energy loss, jump classification & stilling basin guidance.",
+    href: "/calculators/hydraulic-jump",
+    icon: Zap,
+    color: "node",
+  },
 ];
 
 const colorMap: Record<string, string> = {
