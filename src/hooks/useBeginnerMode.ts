@@ -8,12 +8,15 @@ interface BeginnerModeContextType {
 
 const BeginnerModeContext = createContext<BeginnerModeContextType | undefined>(undefined);
 
-export const useBeginnerMode = () => {
+const defaultValue: BeginnerModeContextType = {
+  isBeginnerMode: false,
+  toggleBeginnerMode: () => {},
+  setBeginnerMode: () => {},
+};
+
+export const useBeginnerMode = (): BeginnerModeContextType => {
   const context = useContext(BeginnerModeContext);
-  if (!context) {
-    throw new Error('useBeginnerMode must be used within a BeginnerModeProvider');
-  }
-  return context;
+  return context ?? defaultValue;
 };
 
 export const useBeginnerModeState = () => {
