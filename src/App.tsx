@@ -19,6 +19,7 @@ const FroudePage = lazy(() => import("./pages/calculators/FroudePage"));
 const GVFPage = lazy(() => import("./pages/calculators/GVFPage"));
 const WeirPage = lazy(() => import("./pages/calculators/WeirPage"));
 const CompoundPage = lazy(() => import("./pages/calculators/CompoundPage"));
+const HydraulicJumpPage = lazy(() => import("./pages/calculators/HydraulicJumpPage"));
 const LearnPathwayPage = lazy(() => import("./pages/learn/LearnPathwayPage"));
 const ConceptsPage = lazy(() => import("./pages/reference/ConceptsPage"));
 const RubyScriptsPage = lazy(() => import("./pages/reference/RubyScriptsPage"));
