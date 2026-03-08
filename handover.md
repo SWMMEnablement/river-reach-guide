@@ -269,19 +269,92 @@ Not currently implemented. No user login is required — all features are public
 
 ---
 
-## 10. Potential Next Steps
+## 10. External Review — Grade & Assessment
 
-- **Cloud Progress Sync:** Add database tables to persist learning pathway completion and calculator sessions across devices.
-- **User Authentication:** Enable login to tie progress to user accounts.
-- **Collaborative Features:** Team workspaces, shared annotations, discussion threads for engineering teams.
-- **Batch ICM Export:** Export multiple calculator results into a single packaged file.
-- **Automated Testing:** Add Vitest unit tests for hydraulic calculation logic and Playwright E2E tests.
-- **Mobile Optimisation:** Further responsive refinements for field use on tablets/phones.
-- **Offline AI:** Cache common troubleshooting responses for offline PWA use.
+**Grade: A- (91/100)**
+
+| Category | Score | Notes |
+|---|---|---|
+| Scope & Ambition | A+ (97) | The most comprehensive hydraulic modeling learning tool reviewed |
+| Educational Design | A (94) | Pathways, story mode, beginner toggle, calculator quizzes — layered and thoughtful |
+| Engineering Accuracy | A- (91) | Six real calculators with correct physics; professional data import |
+| Interactive Quality | A (93) | SVG animations, real-time Manning's solver, live cross-section editing |
+| Feature Completeness | A- (90) | Remarkable breadth — channels, culverts, GVF, weirs, compound channels, SuDS, LID, Ruby scripts |
+| Professional Utility | B+ (88) | SWMM import, ICM export, Ruby scripts — genuinely usable by working engineers |
+| Technical Execution | B+ (85) | Solid stack, but monolithic structure, no tests, no persistence |
+| Polish & UX | B+ (87) | Good overall, but sheer volume of content risks overwhelming users |
+
+**Bottom line:** This is not just a learning tool — it's a *reference platform* that a working hydraulic engineer could use daily. The combination of interactive calculators with real physics, professional data import/export (SWMM .inp, ICM .sqlite, ICM CSV), ready-to-use Ruby scripts, AI assistants, and structured learning pathways is unmatched by anything else freely available on the web for InfoWorks ICM education. The rating curve generator alone — with observed data comparison and R² fitting — is something engineers currently do in Excel. The GVF profile calculator with all six M/S profile types is textbook-quality. The compound channel calculator with Lotter composite roughness and Coriolis/Boussinesq corrections shows genuine hydraulic engineering expertise.
+
+### What's Exceptional
+
+1. **Six real hydraulic calculators with genuine engineering depth** — correct physics (Manning's, HY-8, step-backwater), interpretation panels, next-steps recommendations, embedded quizzes, and professional export (ICM CSV, PDF).
+2. **Professional data integration** — parsing EPA SWMM .inp files client-side, loading ICM .sqlite databases via sql.js (WebAssembly), exporting ICM-compatible CSV. Engineers can use actual project data.
+3. **ICM Ruby scripts are immediately usable** — four ready-to-paste scripts covering common automation tasks with usage notes and step-by-step instructions.
+4. **Sophisticated pedagogical layering** — five distinct learning layers (Beginner Mode, Guided Diagram, Learning Pathways, Story Mode, Calculator Quizzes) each serving different learning stages and learner types.
+5. **"Interpretation & Next Steps" panels** — after every calculation, the app explains what results mean and what to do about them, mimicking how a senior engineer mentors a junior.
+6. **Comprehensive SuDS/LID section** — covering nine drainage types and all eight SWMM5 LID control types with ICM implementation notes.
+
+### What Needs Work
+
+1. **Single-page architecture is straining** — navigation suffers with all content on one page. Route-based navigation would improve findability.
+2. **No state persistence** — learning progress, calculator inputs, and chat history vanish on refresh.
+3. **No automated tests** — core hydraulic calculations should be verified against textbook solutions.
+4. **ChannelVisualizer/index.tsx orchestrates too much** — 468 lines managing presets, view tabs, six calculators, import/export, and layout.
+5. **AI chat has no client-side rate limiting** — no protection against endpoint abuse.
 
 ---
 
-## 11. How to Run Locally
+## 11. Improvement Roadmap
+
+### 🟢 Quick Wins (days)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 1 | **Route-Based Navigation** | Replace single-page scroll with proper routes: `/calculators/gvf`, `/learn/culverts`, `/reference/ruby-scripts`, etc. Makes every feature directly linkable, improves SEO, allows bookmarking. |
+| 2 | **Persist Learning Progress** | Use localStorage for pathway progress and last calculator state. Phase 2: migrate to database tables when auth is added. |
+| 3 | **Calculator Quick-Launch Bar** | Persistent floating bar with icons for all six calculators — one click from anywhere in the app. |
+| 4 | **Keyboard Shortcuts** | `Ctrl+1`–`Ctrl+6` for calculators, `Ctrl+K` for concept finder, `Ctrl+E` for export, `Ctrl+B` for beginner mode, `?` for shortcut reference. |
+| 5 | **Compare Scenarios** | "Save as Scenario A / B" in each calculator with side-by-side results display. Engineers constantly compare parameter changes. |
+
+### 🟡 Meaningful Enhancements (weeks)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 6 | **Calculation Verification Suite** | Vitest tests for every calculator against known textbook solutions (Chaudhry 2008, Chadwick et al. 2013, FHWA HDS-5). Run on every code change. |
+| 7 | **Irregular Cross-Section Enhancements** | CSV import of survey data, multiple sections along a reach, drag bank markers, roughness zone painting, auto rating curve generation. |
+| 8 | **Normal Depth Solver** | Standalone calculator: input Q, n, S₀, shape → iterative solution for yₙ. Show convergence process (bisection/Newton-Raphson) as educational tool. |
+| 9 | **Critical Depth Solver** | Input Q + shape → yc, critical velocity, minimum specific energy. |
+| 10 | **Specific Energy Diagram** | Interactive E-y diagram with draggable depth, conjugate depths, hydraulic jump connection, animated flow transition between subcritical/supercritical. |
+| 11 | **Hydraulic Jump Calculator** | Bélanger equation for sequent depth, energy loss, jump length, classification (undular → strong), animated visualisation. Link from Froude calculator at regime transitions. |
+| 12 | **Extended Ruby Script Library** | Create reach from CSV, compare simulations, generate flood map boundary, calibration helper (auto-adjust n), model audit (check common errors). |
+| 13 | **Field Data Comparison Mode** | Upload stage-discharge CSV, fit multiple curves (power law, polynomial, logarithmic), confidence bands, R²/RMSE/Nash-Sutcliffe, recommend n adjustment, export calibrated curve. |
+
+### 🔴 Ambitious Features (months)
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 14 | **Full Reach Builder** | Define 5–20 cross-sections along a reach, set geometry/roughness/slope/BCs, compute complete water surface profile, visualise 3D reach, export as ICM river reach. |
+| 15 | **2D Mesh Playground** | Draw 2D zone boundary, set mesh resolution/roughness, define coupling lines, generate Delaunay mesh, run simplified 2D shallow water computation, visualise flood extent. |
+| 16 | **Model Diagnostic Dashboard** | Import ICM .sqlite → generate diagnostic report: network stats, connectivity check, geometry audit, roughness review, BC check, capacity assessment, health score. |
+| 17 | **Scenario-Based Assessment System** | Formal assessments: e.g. "Predict new water surface profile after weir raises downstream level 0.5m" — student uses GVF calculator, system checks answer. 5–10 scenarios with automated grading. |
+| 18 | **Community Contribution System** | Engineers contribute Ruby scripts, cross-section datasets, troubleshooting case studies, Manning's n reference photos. Submission → review → publish pipeline. |
+| 19 | **Certification Track** | Partner with Autodesk/professional body: 20–40 hours structured content, formal assessments, certificate of completion, CPD/PDH credit eligibility. |
+
+### Priority Timeline
+
+| Timeframe | Focus | Features |
+|---|---|---|
+| **Week 1** | Navigation & Persistence | Route-based navigation (#1), localStorage progress (#2), calculator quick-launch (#3) |
+| **Week 2** | Reliability | Calculation verification tests (#6), client-side rate limiting for AI chat |
+| **Month 1** | Calculator Depth | Normal depth solver (#8), critical depth solver (#9), specific energy diagram (#10), hydraulic jump (#11), compare scenarios (#5) |
+| **Month 2** | Professional Utility | Irregular section enhancements (#7), field data comparison (#13), extended Ruby scripts (#12) |
+| **Month 3** | Platform Features | Full reach builder (#14), model diagnostic dashboard (#16), scenario assessments (#17) |
+| **Month 4+** | Growth | 2D mesh playground (#15), community contributions (#18), certification track (#19) |
+
+---
+
+## 12. How to Run Locally
 
 ```bash
 # Clone the repository
