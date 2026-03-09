@@ -6,6 +6,7 @@ import {
   Calculator, GraduationCap, Library, AlertTriangle,
   ChevronDown, Home
 } from "lucide-react";
+import { CalculatorQuickLaunch } from "./CalculatorQuickLaunch";
 
 interface NavItem {
   label: string;
