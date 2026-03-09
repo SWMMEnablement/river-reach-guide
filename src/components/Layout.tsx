@@ -250,7 +250,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </AnimatePresence>
       </header>
 
-      <main>{children}</main>
+      <main className="pb-16">{children}</main>
+      <CalculatorQuickLaunch />
 
       {/* Footer */}
       <footer className="py-6 sm:py-8 bg-card border-t border-border safe-area-inset">
