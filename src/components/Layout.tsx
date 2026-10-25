@@ -125,6 +125,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </Link>
 
+            {/* Right side: desktop nav + export + mobile menu */}
+            <div className="flex items-center gap-2 lg:gap-5">
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-5">
               {navItems.map(item =>
@@ -157,8 +159,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </a>
             </nav>
 
-            {/* Mobile Menu Button */}
-            <button
+              <AppDataExport />
+
+              {/* Mobile Menu Button */}
+              <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 -mr-2 rounded-lg hover:bg-secondary transition-colors"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
