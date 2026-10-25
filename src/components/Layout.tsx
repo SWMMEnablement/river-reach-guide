@@ -254,7 +254,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <CalculatorQuickLaunch />
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 bg-card border-t border-border safe-area-inset">
+      <footer className="py-6 sm:py-8 pb-24 sm:pb-8 bg-card border-t border-border safe-area-inset">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
