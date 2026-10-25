@@ -1,3 +1,4 @@
+import { ScenarioComparison } from './ScenarioComparison';
 import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Calculator, Download, Plus, Trash2, Upload, Database } from 'lucide-react';
@@ -301,6 +302,29 @@ export const RatingCurveGenerator = () => {
           </p>
         )}
       </div>
+
+      <ScenarioComparison
+            calculatorId="rating-curve"
+            state={{ bottomWidth, sideSlope, manningN, bedSlope, maxStage , observedPoints, importedFrom, importSource }}
+            inputs={[
+            { label: 'Bottom width', value: bottomWidth, unit: 'm' },
+            { label: 'Side slope', value: sideSlope, unit: 'H:V' },
+            { label: 'Manning’s n', value: manningN },
+            { label: 'Bed slope', value: bedSlope, unit: 'm/m' },
+            { label: 'Maximum stage', value: maxStage, unit: 'm' },
+            { label: 'Observed measurements', value: observedPoints.map(point => `${point.stage} m: ${point.discharge} m³/s`).join("; ") },
+            { label: 'Imported source', value: importedFrom ?? "None" }
+          ]}
+            results={[
+            { label: 'Maximum-stage discharge', value: ratingCurveData.find(point => point.stage === Number(maxStage.toFixed(2)))?.theoretical ?? null, unit: 'm³/s' },
+            { label: 'R² coefficient', value: rSquared },
+            { label: 'Observed points', value: observedPoints.length },
+            { label: 'Discharge at 1 m', value: (() => { const depth = 1; const area = (bottomWidth + sideSlope * depth) * depth; const radius = area / (bottomWidth + 2 * depth * Math.sqrt(1 + sideSlope ** 2)); return area * radius ** (2/3) * Math.sqrt(bedSlope) / manningN; })(), unit: 'm³/s' },
+            { label: 'Discharge at 2 m', value: (() => { const depth = 2; const area = (bottomWidth + sideSlope * depth) * depth; const radius = area / (bottomWidth + 2 * depth * Math.sqrt(1 + sideSlope ** 2)); return area * radius ** (2/3) * Math.sqrt(bedSlope) / manningN; })(), unit: 'm³/s' },
+            { label: 'Discharge at 3 m', value: (() => { const depth = 3; const area = (bottomWidth + sideSlope * depth) * depth; const radius = area / (bottomWidth + 2 * depth * Math.sqrt(1 + sideSlope ** 2)); return area * radius ** (2/3) * Math.sqrt(bedSlope) / manningN; })(), unit: 'm³/s' }
+          ]}
+            onRestore={saved => { setBottomWidth(saved.bottomWidth); setSideSlope(saved.sideSlope); setManningN(saved.manningN); setBedSlope(saved.bedSlope); setMaxStage(saved.maxStage); setObservedPoints(saved.observedPoints); setImportedFrom(saved.importedFrom); setImportSource(saved.importSource); }}
+          />
 
       {/* SWMM Import Section */}
       {showImport === 'swmm' && (

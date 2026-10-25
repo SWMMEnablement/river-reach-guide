@@ -1,3 +1,4 @@
+import { ScenarioComparison } from './ScenarioComparison';
 import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -346,6 +347,36 @@ const CulvertDesignCalculator: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        <ScenarioComparison
+            calculatorId="culvert"
+            state={{ params, dimensions, culvertType }}
+            inputs={[
+            { label: 'Culvert type', value: culvertType },
+            { label: 'Diameter', value: culvertType === 'pipe' ? dimensions.diameter ?? null : null, unit: 'm' },
+            { label: 'Width', value: culvertType === 'box' ? dimensions.width ?? null : null, unit: 'm' },
+            { label: 'Height', value: culvertType === 'box' ? dimensions.height ?? null : null, unit: 'm' },
+            { label: 'Design flow', value: params.designFlow, unit: 'm³/s' },
+            { label: 'Headwater depth', value: params.headwaterDepth, unit: 'm' },
+            { label: 'Tailwater depth', value: params.tailwaterDepth, unit: 'm' },
+            { label: 'Culvert length', value: params.culvertLength, unit: 'm' },
+            { label: 'Culvert slope', value: params.culvertSlope, unit: 'm/m' },
+            { label: 'Manning’s n', value: params.manningN },
+            { label: 'Entrance loss coefficient', value: params.entranceLossCoeff }
+          ]}
+            results={[
+            { label: 'Control type', value: calculations.controlType },
+            { label: 'Controlling headwater', value: calculations.controllingHW, unit: 'm' },
+            { label: 'Inlet headwater', value: calculations.inletControlHW, unit: 'm' },
+            { label: 'Outlet headwater', value: calculations.outletControlHW, unit: 'm' },
+            { label: 'Capacity ratio', value: calculations.capacityRatio },
+            { label: 'Adequate capacity', value: calculations.isAdequate },
+            { label: 'Velocity', value: calculations.velocity, unit: 'm/s' },
+            { label: 'Froude number', value: calculations.froudeNumber },
+            { label: 'Friction loss', value: calculations.frictionLoss, unit: 'm' }
+          ]}
+            onRestore={saved => { setParams(saved.params); setDimensions(saved.dimensions); setCulvertType(saved.culvertType); }}
+          />
+
         <Tabs value={culvertType} onValueChange={(v) => setCulvertType(v as CulvertType)}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="pipe" className="flex items-center gap-2">
