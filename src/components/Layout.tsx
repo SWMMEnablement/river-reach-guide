@@ -7,6 +7,7 @@ import {
   ChevronDown, Home
 } from "lucide-react";
 import { CalculatorQuickLaunch } from "./CalculatorQuickLaunch";
+import { AppDataExport } from "./AppDataExport";
 
 interface NavItem {
   label: string;
@@ -266,6 +267,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <p className="text-sm text-muted-foreground">
               Built for hydraulic engineers and modelers
             </p>
+            <AppDataExport />
           </div>
         </div>
       </footer>

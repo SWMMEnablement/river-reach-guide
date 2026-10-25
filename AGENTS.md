@@ -1,3 +1,4 @@
 # Architecture rules
 - Calculator scenario comparison uses a shared typed snapshot component with calculator-specific input and result rows; this preserves existing hydraulic calculations and avoids duplicated comparison behavior.
 - Scenario snapshots are versioned and stored separately per calculator in localStorage; this supports browser-local persistence without introducing account requirements.
+- App data ZIP exports use an explicit app-storage allowlist and a curated reference-content inventory, never browser-wide storage or authentication data; this makes exports useful without leaking credentials.
