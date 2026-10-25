@@ -1,3 +1,4 @@
+import { ScenarioComparison } from './ScenarioComparison';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Layers, ChevronDown, ChevronUp, Info, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -332,6 +333,39 @@ export const CompoundChannelCalculator = () => {
           animate={{ opacity: 1 }}
           className="p-4 border-t border-border space-y-4"
         >
+          <ScenarioComparison
+            calculatorId="compound"
+            state={{ mainBottomWidth, mainBankSlope, mainBankHeight, mainManningN, leftFPWidth, leftFPSlope, leftFPManningN, rightFPWidth, rightFPSlope, rightFPManningN, bedSlope, waterLevel }}
+            inputs={[
+            { label: 'Main bottom width', value: mainBottomWidth, unit: 'm' },
+            { label: 'Main bank slope', value: mainBankSlope, unit: 'H:V' },
+            { label: 'Bank height', value: mainBankHeight, unit: 'm' },
+            { label: 'Main Manning’s n', value: mainManningN },
+            { label: 'Left floodplain width', value: leftFPWidth, unit: 'm' },
+            { label: 'Left floodplain slope', value: leftFPSlope, unit: 'm/m' },
+            { label: 'Left Manning’s n', value: leftFPManningN },
+            { label: 'Right floodplain width', value: rightFPWidth, unit: 'm' },
+            { label: 'Right floodplain slope', value: rightFPSlope, unit: 'm/m' },
+            { label: 'Right Manning’s n', value: rightFPManningN },
+            { label: 'Bed slope', value: bedSlope, unit: 'm/m' },
+            { label: 'Water level', value: waterLevel, unit: 'm' }
+          ]}
+            results={[
+            { label: 'Total discharge', value: calculations.totalDischarge, unit: 'm³/s' },
+            { label: 'Total conveyance', value: calculations.totalConveyance, unit: 'm³/s / √(m/m)' },
+            { label: 'Total area', value: calculations.totalArea, unit: 'm²' },
+            { label: 'Average velocity', value: calculations.avgVelocity, unit: 'm/s' },
+            { label: 'Froude number', value: calculations.froudeNumber },
+            { label: 'Energy correction α', value: calculations.alpha },
+            { label: 'Momentum correction β', value: calculations.beta },
+            { label: 'Composite Manning’s n', value: calculations.compositN },
+            { label: 'Main discharge', value: calculations.zones.find(zone => zone.id === 'main')?.discharge ?? 0, unit: 'm³/s' },
+            { label: 'Left discharge', value: calculations.zones.find(zone => zone.id === 'left-fp')?.discharge ?? 0, unit: 'm³/s' },
+            { label: 'Right discharge', value: calculations.zones.find(zone => zone.id === 'right-fp')?.discharge ?? 0, unit: 'm³/s' }
+          ]}
+            onRestore={saved => { setMainBottomWidth(saved.mainBottomWidth); setMainBankSlope(saved.mainBankSlope); setMainBankHeight(saved.mainBankHeight); setMainManningN(saved.mainManningN); setLeftFPWidth(saved.leftFPWidth); setLeftFPSlope(saved.leftFPSlope); setLeftFPManningN(saved.leftFPManningN); setRightFPWidth(saved.rightFPWidth); setRightFPSlope(saved.rightFPSlope); setRightFPManningN(saved.rightFPManningN); setBedSlope(saved.bedSlope); setWaterLevel(saved.waterLevel); }}
+          />
+
           {/* Cross-Section Visualization */}
           <div className="bg-gradient-to-b from-sky-50 to-blue-100 dark:from-slate-800 dark:to-slate-900 rounded-xl p-4">
             <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full">

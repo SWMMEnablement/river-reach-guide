@@ -1,3 +1,4 @@
+import { ScenarioComparison } from './ScenarioComparison';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Waves, ChevronDown, ChevronUp, Info, Calculator } from 'lucide-react';
@@ -265,6 +266,32 @@ export const WeirOrificeCalculator = () => {
           animate={{ opacity: 1 }}
           className="p-4 border-t border-border"
         >
+          <ScenarioComparison
+            calculatorId="weir"
+            state={{ activeTab, weirType, weirLength, weirHead, weirCd, vNotchAngle, orificeType, orificeDiameter, orificeWidth, orificeHeight, orificeHead, orificeCd }}
+            inputs={[
+            { label: 'Mode', value: activeTab },
+            { label: 'Weir type', value: weirType },
+            { label: 'Crest length', value: weirLength, unit: 'm' },
+            { label: 'Weir head', value: weirHead, unit: 'm' },
+            { label: 'Weir coefficient', value: weirCd },
+            { label: 'Notch angle', value: vNotchAngle, unit: '°' },
+            { label: 'Orifice type', value: orificeType },
+            { label: 'Orifice diameter', value: orificeDiameter, unit: 'm' },
+            { label: 'Orifice width', value: orificeWidth, unit: 'm' },
+            { label: 'Orifice height', value: orificeHeight, unit: 'm' },
+            { label: 'Orifice head', value: orificeHead, unit: 'm' },
+            { label: 'Orifice coefficient', value: orificeCd }
+          ]}
+            results={[
+            { label: 'Discharge', value: activeTab === 'weir' ? weirCalc.Q : orificeCalc.Q, unit: 'm³/s' },
+            { label: 'Velocity', value: activeTab === 'weir' ? weirCalc.velocity : orificeCalc.velocity, unit: 'm/s' },
+            { label: 'Approach Froude', value: activeTab === 'weir' ? weirCalc.froudeApproach : null },
+            { label: 'Orifice area', value: activeTab === 'orifice' ? orificeCalc.A : null, unit: 'm²' }
+          ]}
+            onRestore={saved => { setActiveTab(saved.activeTab); setWeirType(saved.weirType); setWeirLength(saved.weirLength); setWeirHead(saved.weirHead); setWeirCd(saved.weirCd); setVNotchAngle(saved.vNotchAngle); setOrificeType(saved.orificeType); setOrificeDiameter(saved.orificeDiameter); setOrificeWidth(saved.orificeWidth); setOrificeHeight(saved.orificeHeight); setOrificeHead(saved.orificeHead); setOrificeCd(saved.orificeCd); }}
+          />
+
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="weir">Weir Flow</TabsTrigger>

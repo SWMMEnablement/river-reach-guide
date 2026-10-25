@@ -1,3 +1,4 @@
+import { ScenarioComparison } from './ScenarioComparison';
 import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Calculator, Play, RotateCcw, Info, ChevronDown, ChevronUp } from 'lucide-react';
@@ -293,6 +294,32 @@ export const GVFProfileCalculator = () => {
           animate={{ opacity: 1 }}
           className="p-4 border-t border-border space-y-4"
         >
+          <ScenarioComparison
+            calculatorId="gvf"
+            state={{ bottomWidth, sideSlope, discharge, bedSlope, manningN, channelLength, boundaryDepth, numSteps, selectedProfile }}
+            inputs={[
+            { label: 'Bottom width', value: bottomWidth, unit: 'm' },
+            { label: 'Side slope', value: sideSlope, unit: 'H:V' },
+            { label: 'Discharge', value: discharge, unit: 'm³/s' },
+            { label: 'Bed slope', value: bedSlope, unit: 'm/m' },
+            { label: 'Manning’s n', value: manningN },
+            { label: 'Channel length', value: channelLength, unit: 'm' },
+            { label: 'Boundary depth', value: boundaryDepth, unit: 'm' },
+            { label: 'Computation steps', value: numSteps },
+            { label: 'Profile type', value: selectedProfile }
+          ]}
+            results={[
+            { label: 'Normal depth', value: normalDepth, unit: 'm' },
+            { label: 'Critical depth', value: criticalDepth, unit: 'm' },
+            { label: 'Slope classification', value: isMild ? 'Mild' : 'Steep' },
+            { label: 'Upstream depth', value: profile[0]?.depth ?? null, unit: 'm' },
+            { label: 'Downstream depth', value: profile[profile.length - 1]?.depth ?? null, unit: 'm' },
+            { label: 'Maximum depth', value: Math.max(...profile.map(point => point.depth)), unit: 'm' },
+            { label: 'Normal velocity', value: normalHydro.V, unit: 'm/s' }
+          ]}
+            onRestore={saved => { setBottomWidth(saved.bottomWidth); setSideSlope(saved.sideSlope); setDischarge(saved.discharge); setBedSlope(saved.bedSlope); setManningN(saved.manningN); setChannelLength(saved.channelLength); setBoundaryDepth(saved.boundaryDepth); setNumSteps(saved.numSteps); setSelectedProfile(saved.selectedProfile); }}
+          />
+
           {/* Export Buttons */}
           <div className="flex justify-end gap-2 flex-wrap">
             <ICMExportButton

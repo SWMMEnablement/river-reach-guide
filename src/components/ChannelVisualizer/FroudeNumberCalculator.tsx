@@ -1,3 +1,4 @@
+import { ScenarioComparison } from './ScenarioComparison';
 import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -490,6 +491,33 @@ const FroudeNumberCalculator: React.FC = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        <ScenarioComparison
+            calculatorId="froude"
+            state={{ params, analysisPosition }}
+            inputs={[
+            { label: 'Bottom width', value: params.bottomWidth, unit: 'm' },
+            { label: 'Side slope', value: params.sideSlope, unit: 'H:V' },
+            { label: 'Discharge', value: params.discharge, unit: 'm³/s' },
+            { label: 'Bed slope', value: params.bedSlope, unit: 'm/m' },
+            { label: 'Manning’s n', value: params.manningN },
+            { label: 'Upstream depth', value: params.upstreamDepth, unit: 'm' },
+            { label: 'Downstream depth', value: params.downstreamDepth, unit: 'm' },
+            { label: 'Analysis position', value: analysisPosition, unit: '%' }
+          ]}
+            results={[
+            { label: 'Critical depth', value: calculations.criticalDepth, unit: 'm' },
+            { label: 'Normal depth', value: calculations.normalDepth, unit: 'm' },
+            { label: 'Upstream Froude', value: calculations.froudeUpstream },
+            { label: 'Downstream Froude', value: calculations.froudeDownstream },
+            { label: 'Analysis Froude', value: calculations.froudeAtPosition },
+            { label: 'Flow regime', value: calculations.regimeAtPosition },
+            { label: 'Hydraulic jump', value: calculations.jumpOccurs },
+            { label: 'Velocity', value: calculations.velocityAtPosition, unit: 'm/s' },
+            { label: 'Specific energy', value: calculations.specificEnergy, unit: 'm' }
+          ]}
+            onRestore={saved => { setParams(saved.params); setAnalysisPosition(saved.analysisPosition); }}
+          />
+
         {/* Channel Parameters */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>

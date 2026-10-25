@@ -1,3 +1,4 @@
+import { ScenarioComparison } from './ScenarioComparison';
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -301,6 +302,29 @@ const HydraulicJumpCalculator: React.FC = () => {
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
+        <ScenarioComparison
+            calculatorId="hydraulic-jump"
+            state={{ bottomWidth, sideSlope, discharge, y1 }}
+            inputs={[
+            { label: 'Bottom width', value: bottomWidth, unit: 'm' },
+            { label: 'Side slope', value: sideSlope, unit: 'H:V' },
+            { label: 'Discharge', value: discharge, unit: 'm³/s' },
+            { label: 'Upstream depth', value: y1, unit: 'm' }
+          ]}
+            results={[
+            { label: 'Upstream Froude', value: result?.Fr1 ?? null },
+            { label: 'Sequent depth', value: result?.y2 ?? null, unit: 'm' },
+            { label: 'Energy loss', value: result?.energyLoss ?? null, unit: 'm' },
+            { label: 'Dissipation efficiency', value: result?.efficiencyPercent ?? null, unit: '%' },
+            { label: 'Jump length', value: result?.jumpLength ?? null, unit: 'm' },
+            { label: 'Classification', value: result?.classification ?? null },
+            { label: 'Upstream velocity', value: result?.V1 ?? null, unit: 'm/s' },
+            { label: 'Downstream velocity', value: result?.V2 ?? null, unit: 'm/s' }
+          ]}
+            onRestore={saved => { setBottomWidth(saved.bottomWidth); setSideSlope(saved.sideSlope); setDischarge(saved.discharge); setY1(saved.y1); }}
+            canSave={result !== null}
+          />
+
         {/* Inputs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
