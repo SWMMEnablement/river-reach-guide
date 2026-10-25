@@ -4,6 +4,6 @@
 - [x] Test saved snapshots, navigation persistence, restoration, and narrow-screen comparison.
 
 # Detailed data ZIP export
-- [ ] Package saved scenarios, learning progress, preferences, and educational reference content with an inventory and CSV summaries.
-- [ ] Add a ZIP export dialog available throughout the app.
-- [ ] Verify ZIP contents, secret exclusions, and the downloaded file.
+- [x] Package saved scenarios, learning progress, preferences, and educational reference content with an inventory and CSV summaries.
+- [x] Add a ZIP export dialog available throughout the app.
+- [x] Verify ZIP contents, secret exclusions, and the downloaded file.
