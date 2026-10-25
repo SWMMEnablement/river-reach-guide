@@ -1,0 +1,3 @@
+# Architecture rules
+- Calculator scenario comparison uses a shared typed snapshot component with calculator-specific input and result rows; this preserves existing hydraulic calculations and avoids duplicated comparison behavior.
+- Scenario snapshots are versioned and stored separately per calculator in localStorage; this supports browser-local persistence without introducing account requirements.
