@@ -168,7 +168,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
-            </button>
+              </button>
+            </div>
           </div>
         </div>
 
