@@ -19,12 +19,12 @@ export const CalculatorQuickLaunch = () => {
 
   return (
     <motion.div
-      initial={{ y: 80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      initial={{ y: 80, opacity: 0, x: "-50%" }}
+      animate={{ y: 0, opacity: 1, x: "-50%" }}
       transition={{ delay: 0.5, type: "spring", stiffness: 200, damping: 20 }}
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40"
+      className="fixed bottom-4 left-1/2 z-40"
     >
-      <div className="flex items-center gap-1 px-3 py-2 rounded-full bg-card/95 backdrop-blur-md border border-border shadow-lg">
+      <div className="flex items-center gap-0.5 px-2 py-1.5 rounded-full bg-card/95 backdrop-blur-md border border-border shadow-lg sm:gap-1 sm:px-3 sm:py-2">
         {calculators.map((calc) => {
           const isActive = location.pathname === calc.href;
           return (
